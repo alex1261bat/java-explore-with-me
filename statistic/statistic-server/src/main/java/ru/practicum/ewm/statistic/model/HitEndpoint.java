@@ -34,9 +34,7 @@ public class HitEndpoint {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         HitEndpoint current = (HitEndpoint) o;
-        return Objects.equals(app, current.app) &&
-                Objects.equals(uri, current.uri) &&
-                Objects.equals(ip, current.ip);
+        return Objects.equals(id, current.id);
     }
 
     @Override

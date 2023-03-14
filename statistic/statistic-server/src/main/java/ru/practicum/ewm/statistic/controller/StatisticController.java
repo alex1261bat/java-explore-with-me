@@ -9,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.statistic.model.HitEndpoint;
-import ru.practicum.ewm.statistic.model.StatisticMapper;
 import ru.practicum.ewm.statistic.service.StatisticService;
 
 import javax.validation.Valid;
@@ -27,9 +25,8 @@ public class StatisticController {
 
     @PostMapping("/hit")
     public ResponseEntity<HitEndpointDto> saveStat(@RequestBody @Valid HitEndpointDto hitEndpointDto) {
-        log.info("Контроллер: Запрос на сохрание информации об обращении к эндпоинту {}", hitEndpointDto.getUri());
-        HitEndpoint hitEndpoint1 = StatisticMapper.INSTANCE.toEndpointHit(hitEndpointDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(statisticService.saveStatistic(hitEndpoint1));
+        log.info("Запрос на сохранение информации об обращении к эндпоинту {}", hitEndpointDto.getUri());
+        return ResponseEntity.status(HttpStatus.CREATED).body(statisticService.saveStatistic(hitEndpointDto));
     }
 
     @GetMapping("/stats")
@@ -39,7 +36,7 @@ public class StatisticController {
                                  LocalDateTime end,
                                       @RequestParam List<String> uris,
                                       @RequestParam(defaultValue = "false") boolean unique) {
-        log.info("Контроллер: Получен запрос на получение статистики");
+        log.info("Запрос на получение статистики");
         return statisticService.getStatistic(start, end, uris, unique);
     }
 }

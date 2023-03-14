@@ -10,7 +10,7 @@ import org.mapstruct.factory.Mappers;
 public interface StatisticMapper {
     StatisticMapper INSTANCE = Mappers.getMapper(StatisticMapper.class);
 
-    HitEndpointDto toEndpointHitDto(HitEndpoint endpointHit);
+    HitEndpointDto toHitEndpointDto(HitEndpoint hitEndpoint);
 
-    HitEndpoint toEndpointHit(HitEndpointDto endpointHitDto);
+    HitEndpoint toHitEndpoint(HitEndpointDto hitEndpointDto);
 }
