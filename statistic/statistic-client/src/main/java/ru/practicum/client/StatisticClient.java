@@ -1,60 +1,89 @@
 package ru.practicum.client;
 
-import dto.HitEndpointDto;
 import dto.StatisticDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.web.server.ResponseStatusException;
 
-import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
 public class StatisticClient {
     private final RestTemplate restTemplate;
 
-    @Autowired
-    public StatisticClient(@Value("${stat-server.url}") String url,
-                           RestTemplateBuilder restTemplateBuilder) {
-        this.restTemplate = restTemplateBuilder
-                .uriTemplateHandler(new DefaultUriBuilderFactory(url))
-                .build();
+    public  <T> void addHit(T body) {
+        makeRequest(body);
     }
 
-    public void addHit(HttpServletRequest httpServletRequest) {
-        HitEndpointDto hitEndpointDto = new HitEndpointDto(
-                null,
-                "main",
-                httpServletRequest.getRequestURI(),
-                httpServletRequest.getRemoteAddr(),
-                LocalDateTime.now()
-        );
+    public ResponseEntity<List<StatisticDto>> getStatistic(String path, Map<String, Object> parameters) {
+        HttpEntity<Object> requestEntity = new HttpEntity<>(null, getHeader());
+        ResponseEntity<List<StatisticDto>> statisticServerResponse;
 
-        restTemplate.postForEntity("/hit",
-                new HttpEntity<>(hitEndpointDto),
-                HitEndpointDto.class);
+        try {
+            statisticServerResponse = restTemplate.exchange(path, HttpMethod.GET, requestEntity,
+                    new ParameterizedTypeReference<>() {
+            }, parameters);
+        } catch (HttpStatusCodeException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        }
+
+        return createClientResponse(statisticServerResponse);
     }
 
-    public ResponseEntity<List<StatisticDto>> getStatistic(String start, String end, List<String> uris, boolean unique) {
-        return restTemplate.exchange("/stats?start={start}&end={end}&uris={uris}&unique={unique}",
-                HttpMethod.GET,
-                getHttpEntity(null),
-                new ParameterizedTypeReference<>() {
-                },
-                start, end, uris, unique);
+    private void createResponse(ResponseEntity<Object> response) {
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return;
+        }
+
+        ResponseEntity.BodyBuilder bodyBuilder = ResponseEntity.status((response.getStatusCode()));
+
+        if (response.hasBody()) {
+            bodyBuilder.body(response.getBody());
+            return;
+        }
+
+        bodyBuilder.build();
     }
 
-    private <T> HttpEntity<T> getHttpEntity(T dto) {
+    private ResponseEntity<List<StatisticDto>> createClientResponse(ResponseEntity<List<StatisticDto>> response) {
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return response;
+        }
+
+        ResponseEntity.BodyBuilder bodyBuilder = ResponseEntity.status((response.getStatusCode()));
+
+        if (response.hasBody()) {
+            return bodyBuilder.body(response.getBody());
+        }
+
+        return bodyBuilder.build();
+    }
+
+    private <T> void makeRequest(@Nullable T body) {
+        HttpEntity<T> requestEntity = new HttpEntity<>(body, getHeader());
+        ResponseEntity<Object> statsServerResponse;
+
+        try {
+            statsServerResponse = restTemplate.exchange("/hit", HttpMethod.POST, requestEntity, Object.class);
+        } catch (HttpStatusCodeException ex) {
+            ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsByteArray());
+            return;
+        }
+
+        createResponse(statsServerResponse);
+    }
+
+    private HttpHeaders getHeader() {
         HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        return dto == null ? new HttpEntity<>(headers) : new HttpEntity<>(dto, headers);
+        return headers;
     }
 }

@@ -209,10 +209,10 @@ public class EventServiceImp implements EventService {
 
     @Override
     public EventDto getEventByIdPublic(Long eventId, HttpServletRequest httpServletRequest) {
-        mainStatisticClient.post(httpServletRequest);
+        mainStatisticClient.add(httpServletRequest, "ewm-server");
         Event event = eventRepository.findByEventIdAndState(eventId, EventState.PUBLISHED)
                 .orElseThrow(() -> new NotFoundException("Событие с id=" + eventId + " не найдено"));
-        event.setViews(mainStatisticClient.getStatistic(eventId));
+        event.setViews(mainStatisticClient.get(eventId));
 
         return EventMapper.INSTANCE.mapToEventDto(eventRepository.save(event));
     }
@@ -222,7 +222,7 @@ public class EventServiceImp implements EventService {
                                                       LocalDateTime rangeStart, LocalDateTime rangeEnd,
                                                       Boolean onlyAvailable,
                                                       Pageable pageable, HttpServletRequest httpServletRequest) {
-        mainStatisticClient.post(httpServletRequest);
+        mainStatisticClient.add(httpServletRequest, "ewm-server");
         BooleanBuilder booleanBuilder = createQuery(null, null, categories, rangeStart, rangeEnd);
         Page<Event> page;
 
