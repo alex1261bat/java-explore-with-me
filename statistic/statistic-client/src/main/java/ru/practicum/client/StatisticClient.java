@@ -1,6 +1,9 @@
+package ru.practicum.client;
+
 import dto.HitEndpointDto;
 import dto.StatisticDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
@@ -17,12 +20,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StatisticClient {
     private final RestTemplate restTemplate;
-    private final String appName;
 
+    @Autowired
     public StatisticClient(@Value("${stat-server.url}") String url,
-                           @Value("${application.name}") String appName,
                            RestTemplateBuilder restTemplateBuilder) {
-        this.appName = appName;
         this.restTemplate = restTemplateBuilder
                 .uriTemplateHandler(new DefaultUriBuilderFactory(url))
                 .build();
