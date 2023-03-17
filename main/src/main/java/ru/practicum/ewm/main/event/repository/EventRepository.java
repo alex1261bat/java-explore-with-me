@@ -15,6 +15,7 @@ import java.util.Set;
 public interface EventRepository extends PagingAndSortingRepository<Event, Long>, QuerydslPredicateExecutor<Event> {
 
     Optional<Event> findByEventIdIs(Long eventId);
+
     List<Event> findAllByInitiatorUserId(Long userId, Pageable pageable);
 
     Optional<Event> findByEventIdAndInitiatorUserId(Long eventId, Long userId);
