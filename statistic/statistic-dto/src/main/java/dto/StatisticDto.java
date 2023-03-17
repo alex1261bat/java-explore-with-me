@@ -1,16 +1,17 @@
 package dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
+@Builder(toBuilder = true)
 @AllArgsConstructor
+@NoArgsConstructor
 public class StatisticDto {
+    @JsonProperty("app")
     private String app;
+    @JsonProperty("uri")
     private String uri;
-    private long hits;
+    @JsonProperty("hits")
+    private Long hits;
 }
