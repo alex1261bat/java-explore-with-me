@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@RequiredArgsConstructor
+@NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "requests")
 public class Request {
@@ -28,5 +28,6 @@ public class Request {
     @JoinColumn(name = "REQUESTER_ID", nullable = false, unique = true)
     private User requester;
     @Enumerated(EnumType.STRING)
+    @Column(name = "STATUS")
     private RequestStatus status = RequestStatus.PENDING;
 }

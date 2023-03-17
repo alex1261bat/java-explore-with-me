@@ -3,10 +3,8 @@ package ru.practicum.ewm.main.request.dto;
 import lombok.*;
 import ru.practicum.ewm.main.request.model.RequestStatus;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
+@Builder
 public class RequestDto {
     private Long id;
     private Long event;

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.main.exceptions.NotFoundException;
 import ru.practicum.ewm.main.user.dto.UserDto;
 import ru.practicum.ewm.main.user.dto.UserListDto;
@@ -19,13 +20,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Override
+    @Transactional
     public UserDto createUser(UserDto userDto) {
-        return UserMapper.INSTANCE.mapToUserDto(userRepository.save(UserMapper.INSTANCE.mapToUser(userDto)));
+        return userMapper.mapToUserDto(userRepository.save(userMapper.mapToUser(userDto)));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserListDto getUsers(List<Long> ids, Pageable pageable) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -42,14 +46,15 @@ public class UserServiceImpl implements UserService {
         }
 
         return UserListDto.builder()
-                .users(UserMapper.INSTANCE.mapToUserDto(page))
+                .users(userMapper.mapToUserDto(page))
                 .build();
     }
 
     @Override
+    @Transactional
     public void deleteUser(Long userId) {
-        if (userRepository.existsByUserId(userId)) {
-            userRepository.deleteByUserId(userId);
+        if (userRepository.existsById(userId)) {
+            userRepository.deleteById(userId);
         } else {
             throw new NotFoundException("Пользователь с id=" + userId + " не найден");
         }

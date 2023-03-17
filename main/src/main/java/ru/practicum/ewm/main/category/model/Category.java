@@ -1,9 +1,6 @@
 package ru.practicum.ewm.main.category.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
@@ -12,7 +9,8 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
-@RequiredArgsConstructor
+@ToString
+@NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "categories")
 public class Category {

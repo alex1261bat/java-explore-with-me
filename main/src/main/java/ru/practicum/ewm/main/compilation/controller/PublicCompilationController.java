@@ -2,7 +2,6 @@ package ru.practicum.ewm.main.compilation.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +14,10 @@ import ru.practicum.ewm.main.compilation.service.CompilationService;
 import javax.validation.constraints.Min;
 
 @RestController
-@RequestMapping("/compilations")
 @Slf4j
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @Validated
+@RequiredArgsConstructor
+@RequestMapping("/compilations")
 public class PublicCompilationController {
     private final CompilationService compilationService;
 

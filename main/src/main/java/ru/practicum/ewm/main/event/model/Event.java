@@ -1,9 +1,6 @@
 package ru.practicum.ewm.main.event.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import ru.practicum.ewm.main.category.model.Category;
 import ru.practicum.ewm.main.compilation.model.Compilation;
 import ru.practicum.ewm.main.request.model.Request;
@@ -16,7 +13,8 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@RequiredArgsConstructor
+@ToString
+@NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "events")
 public class Event {

@@ -8,5 +8,5 @@ public interface RequestService {
 
     RequestListDto getUserRequests(Long userId);
 
-    RequestDto canceledRequest(Long userId, Long eventId);
+    RequestDto cancelRequest(Long userId, Long eventId);
 }

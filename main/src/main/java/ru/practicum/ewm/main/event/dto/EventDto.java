@@ -6,10 +6,8 @@ import ru.practicum.ewm.main.event.model.EventState;
 import ru.practicum.ewm.main.event.model.Location;
 import ru.practicum.ewm.main.user.dto.UserDto;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
+@Builder
 public class EventDto {
     private Long id;
     private String annotation;

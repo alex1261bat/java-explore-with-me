@@ -40,6 +40,6 @@ public class RequestController {
                                                     @PathVariable @Min(1) Long requestId) {
         log.info("Отмена запроса с id={} и userId={}", requestId, userId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(requestService.canceledRequest(userId, requestId));
+        return ResponseEntity.status(HttpStatus.OK).body(requestService.cancelRequest(userId, requestId));
     }
 }

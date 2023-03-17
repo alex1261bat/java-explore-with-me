@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.main.compilation.dto.*;
 import ru.practicum.ewm.main.compilation.model.Compilation;
 import ru.practicum.ewm.main.compilation.model.QCompilation;
@@ -20,43 +21,49 @@ import java.util.Set;
 public class CompilationServiceImp implements CompilationService {
     private final CompilationRepository compilationRepository;
     private final EventRepository eventRepository;
+    private final CompilationMapper compilationMapper;
 
     @Override
+    @Transactional
     public CompilationResponseDto addCompilation(NewCompilationDto compilationDto) {
         Set<Event> findEvents = eventRepository.findAllByEventIdIn(compilationDto.getEvents());
-        Compilation compilation = CompilationMapper.INSTANCE.mapToCompilation(compilationDto);
+        Compilation compilation = compilationMapper.mapToCompilation(compilationDto);
         compilation.setEvents(findEvents);
 
-        return CompilationMapper.INSTANCE.mapToCompilationResp(compilationRepository.save(compilation));
+        return compilationMapper.mapToCompilationResp(compilationRepository.save(compilation));
     }
 
     @Override
+    @Transactional
     public void deleteCompilation(Long compilationId) {
-        if (compilationRepository.existsByCompilationId(compilationId)) {
-            compilationRepository.deleteByCompilationId(compilationId);
+        if (compilationRepository.existsById(compilationId)) {
+            compilationRepository.deleteById(compilationId);
         } else {
             throw new NotFoundException("Компиляция с id=" + compilationId + " не найдена");
         }
     }
 
     @Override
+    @Transactional
     public CompilationResponseDto updateCompilation(Long compilationId, UpdateCompilationRequestDto updateCompilation) {
-        Compilation compilation = compilationRepository.findByCompilationId(compilationId)
+        Compilation compilation = compilationRepository.findById(compilationId)
                 .orElseThrow(() -> new NotFoundException("Компиляция с id=" + compilationId + " не найдена"));
         Set<Event> findEvents = eventRepository.findAllByEventIdIn(updateCompilation.getEvents());
-        compilation = CompilationMapper.INSTANCE.mapToCompilation(updateCompilation, compilation);
+        compilation = compilationMapper.mapToCompilation(updateCompilation, compilation);
         compilation.setEvents(findEvents);
 
-        return CompilationMapper.INSTANCE.mapToCompilationResp(compilationRepository.save(compilation));
+        return compilationMapper.mapToCompilationResp(compilationRepository.save(compilation));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CompilationResponseDto getCompilation(Long compilationId) {
-        return CompilationMapper.INSTANCE.mapToCompilationResp(compilationRepository.findByCompilationId(compilationId)
+        return compilationMapper.mapToCompilationResp(compilationRepository.findById(compilationId)
                 .orElseThrow(() -> new NotFoundException("Компиляция с id=" + compilationId + " не найдена")));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CompilationListDto getCompilations(Boolean pinned, Pageable pageable) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         Page<Compilation> page;
@@ -71,9 +78,8 @@ public class CompilationServiceImp implements CompilationService {
             page = compilationRepository.findAll(pageable);
         }
 
-        return CompilationListDto
-                .builder()
-                .compilations(CompilationMapper.INSTANCE.mapToCompilationRespList(page.getContent()))
+        return CompilationListDto.builder()
+                .compilations(compilationMapper.mapToCompilationRespList(page.getContent()))
                 .build();
     }
 }

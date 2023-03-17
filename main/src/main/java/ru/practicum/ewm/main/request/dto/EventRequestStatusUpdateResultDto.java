@@ -4,10 +4,7 @@ import lombok.*;
 
 import java.util.List;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 @Builder
 public class EventRequestStatusUpdateResultDto {
     private List<RequestDto> confirmedRequests;

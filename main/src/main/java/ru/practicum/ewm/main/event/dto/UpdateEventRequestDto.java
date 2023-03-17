@@ -3,10 +3,8 @@ package ru.practicum.ewm.main.event.dto;
 import lombok.*;
 import ru.practicum.ewm.main.event.model.Location;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
+@Builder
 public class UpdateEventRequestDto {
     private String annotation;
     private Long category;

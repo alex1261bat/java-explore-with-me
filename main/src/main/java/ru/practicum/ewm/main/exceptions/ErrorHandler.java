@@ -14,6 +14,7 @@ import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Objects;
 
 @RestControllerAdvice
 @Slf4j
@@ -30,10 +31,11 @@ public class ErrorHandler {
                 .timestamp(LocalDateTime.now().format(formatter))
                 .build();
         log.info("HttpStatus.NOT_FOUND:{}", errorResponse);
+
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
-    @ExceptionHandler({ValidationException.class, DataIntegrityViolationException.class})
+    @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ApiError> handleExceptions(RuntimeException e) {
         ApiError errorResponse = ApiError.builder()
                 .errors(Arrays.asList(e.getStackTrace()))
@@ -43,12 +45,26 @@ public class ErrorHandler {
                 .timestamp(LocalDateTime.now().format(formatter))
                 .build();
         log.info("HttpStatus.CONFLICT:{}", errorResponse);
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    private ResponseEntity<ApiError> handleException(DataIntegrityViolationException e) {
+        ApiError errorResponse = ApiError.builder()
+                .errors(Arrays.asList(e.getStackTrace()))
+                .message(e.getMessage())
+                .reason("Некорректная валидация.")
+                .status(String.valueOf(HttpStatus.CONFLICT))
+                .timestamp(LocalDateTime.now().format(formatter))
+                .build();
+        log.info("HttpStatus.CONFLICT:{}", errorResponse);
+
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     @ExceptionHandler({MethodArgumentTypeMismatchException.class, EventUpdateException.class,
-            MissingServletRequestParameterException.class, ConstraintViolationException.class,
-            MethodArgumentNotValidException.class})
+            MissingServletRequestParameterException.class})
     public ResponseEntity<ApiError> handleException(Exception e) {
         ApiError errorResponse = ApiError.builder()
                 .errors(Arrays.asList(e.getStackTrace()))
@@ -58,6 +74,35 @@ public class ErrorHandler {
                 .timestamp(LocalDateTime.now().format(formatter))
                 .build();
         log.info("HttpStatus.BAD_REQUEST:{}", errorResponse);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    private ResponseEntity<ApiError> handleException(ConstraintViolationException e) {
+        ApiError errorResponse = ApiError.builder()
+                .errors(Arrays.asList(e.getStackTrace()))
+                .message(e.getMessage())
+                .reason("Недопустимые параметры запроса.")
+                .status(HttpStatus.BAD_REQUEST.toString())
+                .timestamp(LocalDateTime.now().format(formatter))
+                .build();
+        log.info("HttpStatus.BAD_REQUEST:{}", errorResponse);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    private ResponseEntity<ApiError> handleException(MethodArgumentNotValidException e) {
+        ApiError errorResponse = ApiError.builder()
+                .errors(Arrays.asList(e.getStackTrace()))
+                .message(Objects.requireNonNull(e.getFieldError()).getDefaultMessage())
+                .reason("Недопустимые параметры запроса.")
+                .status(HttpStatus.BAD_REQUEST.toString())
+                .timestamp(LocalDateTime.now().format(formatter))
+                .build();
+        log.info("HttpStatus.BAD_REQUEST:{}", errorResponse);
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 }

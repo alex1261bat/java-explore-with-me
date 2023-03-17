@@ -29,11 +29,11 @@ public class PublicEventController {
     private static final String FORMATTER = "yyyy-MM-dd HH:mm:ss";
 
     @GetMapping("{id}")
-    public ResponseEntity<EventDto> getEventById(@PathVariable("id") @Min(1) Long eventId,
+    public ResponseEntity<EventDto> getEventById(@PathVariable @Min(1) Long id,
                                                  HttpServletRequest servlet) {
-        log.info("Получить событие с id={}", eventId);
+        log.info("Получить событие с id={}", id);
 
-        return ResponseEntity.status(HttpStatus.OK).body(eventService.getEventByIdPublic(eventId, servlet));
+        return ResponseEntity.status(HttpStatus.OK).body(eventService.getEventByIdPublic(id, servlet));
     }
 
     @GetMapping
@@ -51,9 +51,8 @@ public class PublicEventController {
         log.info("Получить события общедоступные");
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(eventService.getEventsByFiltersPublic(
-                        text, categories, paid, rangeStart, rangeEnd, onlyAvailable,
-                        PageRequest.of(from / size, size,
-                                Sort.by(EventSort.getSortField(sort)).ascending()), servlet));
+                .body(eventService.getEventsByFiltersPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable,
+                        PageRequest.of(from / size, size, Sort.by(EventSort.getSortField(sort)).ascending()),
+                        servlet));
     }
 }

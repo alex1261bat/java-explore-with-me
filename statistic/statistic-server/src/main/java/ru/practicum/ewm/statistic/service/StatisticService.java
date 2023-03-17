@@ -4,38 +4,40 @@ import dto.HitEndpointDto;
 import dto.StatisticDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.statistic.model.StatisticMapper;
 import ru.practicum.ewm.statistic.repository.StatisticRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class StatisticService {
     private final StatisticRepository statisticRepository;
+    private final StatisticMapper statisticMapper;
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+    @Transactional
     public HitEndpointDto saveStatistic(HitEndpointDto hitEndpointDto) {
-        return StatisticMapper.INSTANCE.toHitEndpointDto(
-                statisticRepository.save(StatisticMapper.INSTANCE.toHitEndpoint(hitEndpointDto)));
+        return statisticMapper.toHitEndpointDto(
+                statisticRepository.save(statisticMapper.toHitEndpoint(hitEndpointDto)));
     }
 
-    public List<StatisticDto> getStatistic(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
-        if (uris == null || uris.isEmpty()) {
-            return new ArrayList<>();
+    @Transactional(readOnly = true)
+    public List<StatisticDto> getStatistic(String start, String end, List<String> uris, Boolean unique) {
+        LocalDateTime parseStart = LocalDateTime.parse(start, formatter);
+        LocalDateTime parseEnd = LocalDateTime.parse(end, formatter);
+
+        if (unique) {
+            return uris == null
+                    ? statisticRepository.getUniqueStat(parseStart, parseEnd)
+                    : statisticRepository.getUniqueUrisStat(parseStart, parseEnd, uris);
         } else {
-            if (unique) {
-                return statisticRepository.findStatWithUnique(uris, start, end)
-                        .stream()
-                        .sorted(Comparator.comparing(StatisticDto::getHits).reversed()).collect(Collectors.toList());
-            } else {
-                return statisticRepository.findStatNOtUnique(uris, start, end)
-                        .stream()
-                        .sorted(Comparator.comparing(StatisticDto::getHits).reversed()).collect(Collectors.toList());
-            }
+            return uris == null
+                    ? statisticRepository.getStat(parseStart, parseEnd)
+                    : statisticRepository.getUrisStat(parseStart, parseEnd, uris);
         }
     }
 }

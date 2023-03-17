@@ -1,20 +1,19 @@
 package ru.practicum.ewm.main.compilation.dto;
 
 import org.mapstruct.*;
-
-import org.mapstruct.factory.Mappers;
 import ru.practicum.ewm.main.compilation.model.Compilation;
+import ru.practicum.ewm.main.event.dto.EventMapper;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring",
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+        uses = EventMapper.class)
 public interface CompilationMapper {
-    CompilationMapper INSTANCE = Mappers.getMapper(CompilationMapper.class);
 
     @Mapping(target = "events", ignore = true)
     Compilation mapToCompilation(NewCompilationDto compilationDto);
 
+    @Mapping(target = "id", source = "compilationId")
     CompilationResponseDto mapToCompilationResp(Compilation compilation);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

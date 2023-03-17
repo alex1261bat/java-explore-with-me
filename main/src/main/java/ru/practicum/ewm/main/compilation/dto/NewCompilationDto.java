@@ -5,10 +5,8 @@ import lombok.*;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
+@Builder
 public class NewCompilationDto {
     private List<Long> events;
     private Boolean pinned;

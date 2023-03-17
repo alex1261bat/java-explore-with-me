@@ -1,16 +1,11 @@
 package ru.practicum.ewm.main.request.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
+@Builder
 public class EventRequestStatusUpdateDto {
     private List<Long> requestIds;
     private String status;

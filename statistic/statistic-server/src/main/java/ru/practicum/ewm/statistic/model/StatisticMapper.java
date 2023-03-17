@@ -2,15 +2,18 @@ package ru.practicum.ewm.statistic.model;
 
 import dto.HitEndpointDto;
 import org.mapstruct.Mapper;
-import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring",
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper
 public interface StatisticMapper {
-    StatisticMapper INSTANCE = Mappers.getMapper(StatisticMapper.class);
 
+    @Mapping(source = "timestamp",
+             target = "timestamp",
+             dateFormat = "yyyy-MM-dd HH:mm:ss")
     HitEndpointDto toHitEndpointDto(HitEndpoint hitEndpoint);
 
+    @Mapping(source = "timestamp",
+             target = "timestamp",
+             dateFormat = "yyyy-MM-dd HH:mm:ss")
     HitEndpoint toHitEndpoint(HitEndpointDto hitEndpointDto);
 }

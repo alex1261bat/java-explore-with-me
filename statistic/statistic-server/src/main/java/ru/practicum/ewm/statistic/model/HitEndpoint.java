@@ -1,44 +1,26 @@
 package ru.practicum.ewm.statistic.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
-@RequiredArgsConstructor
 @Table(name = "hits")
 public class HitEndpoint {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID")
     private Long id;
-    @Column(nullable = false)
+    @Column(name = "APP", nullable = false)
     private String app;
-    @Column(nullable = false)
+    @Column(name = "URI", nullable = false)
     private String uri;
-    @Column(nullable = false)
+    @Column(name = "IP", nullable = false)
     private String ip;
-    @Column(name = "created", nullable = false)
+    @Column(name = "CREATED", nullable = false)
     private LocalDateTime timestamp;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        HitEndpoint current = (HitEndpoint) o;
-        return Objects.equals(id, current.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(app, uri, ip, timestamp);
-    }
 }

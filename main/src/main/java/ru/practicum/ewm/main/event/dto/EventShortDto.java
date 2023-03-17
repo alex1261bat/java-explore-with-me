@@ -4,10 +4,8 @@ import lombok.*;
 import ru.practicum.ewm.main.category.dto.CategoryDto;
 import ru.practicum.ewm.main.user.dto.UserDto;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
+@Builder
 public class EventShortDto {
     private Long id;
     private String annotation;
