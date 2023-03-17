@@ -9,7 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface RequestRepository extends JpaRepository<Request, Long> {
-    Request save(Request request);
 
     Optional<Request> findByRequestIdIs(Long requestId);
 

@@ -13,7 +13,6 @@ import java.util.Set;
 
 @Repository
 public interface EventRepository extends PagingAndSortingRepository<Event, Long>, QuerydslPredicateExecutor<Event> {
-    Event save(Event event);
 
     Optional<Event> findByEventIdIs(Long eventId);
     List<Event> findAllByInitiatorUserId(Long userId, Pageable pageable);

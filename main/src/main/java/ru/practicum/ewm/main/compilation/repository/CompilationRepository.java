@@ -12,8 +12,6 @@ import java.util.Optional;
 public interface CompilationRepository extends PagingAndSortingRepository<Compilation, Long>,
         QuerydslPredicateExecutor<Compilation> {
 
-    Compilation save(Compilation compilation);
-
     void deleteByCompilationId(Long compilationId);
 
     Optional<Compilation> findByCompilationId(Long compilationId);
