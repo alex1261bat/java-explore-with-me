@@ -36,7 +36,7 @@ public class MainStatisticClient extends StatisticClient {
                 .app(app)
                 .uri(servlet.getRequestURI())
                 .ip(servlet.getRemoteAddr())
-                .timestamp(LocalDateTime.now())
+                .timestamp(LocalDateTime.now().format(formatter))
                 .build();
 
         addHit("/hit", hitEndpointDto);
