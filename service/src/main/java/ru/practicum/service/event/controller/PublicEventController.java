@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.service.event.dto.EventDto;
-import ru.practicum.service.event.dto.ListEventShortDto;
+import ru.practicum.service.event.dto.EventShortDto;
 import ru.practicum.service.event.model.EventSort;
 import ru.practicum.service.event.service.EventService;
 
@@ -38,7 +38,7 @@ public class PublicEventController {
     }
 
     @GetMapping
-    public ResponseEntity<ListEventShortDto> getEventsPublic(
+    public ResponseEntity<List<EventShortDto>> getEventsPublic(
             @RequestParam(required = false) String text,
             @RequestParam(required = false) List<Long> categories,
             @RequestParam(required = false) Boolean paid,

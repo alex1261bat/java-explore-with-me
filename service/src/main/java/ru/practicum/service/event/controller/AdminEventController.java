@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.service.event.dto.EventDto;
-import ru.practicum.service.event.dto.ListEventDto;
 import ru.practicum.service.event.dto.UpdateEventRequestDto;
 import ru.practicum.service.event.service.EventService;
 
@@ -29,7 +28,7 @@ public class AdminEventController {
     private static final String FORMATTER = "yyyy-MM-dd HH:mm:ss";
 
     @GetMapping
-    public ResponseEntity<ListEventDto> getEventsByFiltersForAdmin(
+    public ResponseEntity<List<EventDto>> getEventsByFiltersForAdmin(
             @RequestParam(required = false) List<Long> users,
             @RequestParam(required = false) List<String> states,
             @RequestParam(required = false) List<Long> categories,

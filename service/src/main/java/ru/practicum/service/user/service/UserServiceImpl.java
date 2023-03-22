@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.service.exceptions.NotFoundException;
 import ru.practicum.service.user.dto.UserDto;
-import ru.practicum.service.user.dto.UserListDto;
 import ru.practicum.service.user.dto.UserMapper;
 import ru.practicum.service.user.model.QUser;
 import ru.practicum.service.user.model.User;
@@ -31,7 +30,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserListDto getUsers(List<Long> ids, Pageable pageable) {
+    public List<UserDto> getUsers(List<Long> ids, Pageable pageable) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
         if (ids != null && !ids.isEmpty()) {
@@ -46,9 +45,7 @@ public class UserServiceImpl implements UserService {
             page = userRepository.findAll(pageable);
         }
 
-        return UserListDto.builder()
-                .users(userMapper.mapToUserDto(page))
-                .build();
+        return userMapper.mapToUserDto(page);
     }
 
     @Override

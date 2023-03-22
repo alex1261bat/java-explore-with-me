@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.service.compilation.dto.*;
-import ru.practicum.service.compilation.dto.*;
 import ru.practicum.service.compilation.model.Compilation;
 import ru.practicum.service.compilation.model.QCompilation;
 import ru.practicum.service.compilation.repository.CompilationRepository;
@@ -16,6 +15,7 @@ import ru.practicum.service.event.model.Event;
 import ru.practicum.service.event.repository.EventRepository;
 import ru.practicum.service.exceptions.NotFoundException;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -66,7 +66,7 @@ public class CompilationServiceImp implements CompilationService {
 
     @Override
     @Transactional(readOnly = true)
-    public CompilationListDto getCompilations(Boolean pinned, Pageable pageable) {
+    public List<CompilationResponseDto> getCompilations(Boolean pinned, Pageable pageable) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         Page<Compilation> page;
 
@@ -80,8 +80,6 @@ public class CompilationServiceImp implements CompilationService {
             page = compilationRepository.findAll(pageable);
         }
 
-        return CompilationListDto.builder()
-                .compilations(compilationMapper.mapToCompilationRespList(page.getContent()))
-                .build();
+        return compilationMapper.mapToCompilationRespList(page.getContent());
     }
 }

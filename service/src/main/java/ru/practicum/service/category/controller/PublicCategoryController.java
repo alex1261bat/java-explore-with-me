@@ -9,10 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.service.category.dto.CategoryDto;
-import ru.practicum.service.category.dto.CategoryListDto;
 import ru.practicum.service.category.service.CategoryService;
 
 import javax.validation.constraints.Min;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -23,8 +23,8 @@ public class PublicCategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public ResponseEntity<CategoryListDto> getCategories(@RequestParam(defaultValue = "0") @Min(0) Integer from,
-                                                         @RequestParam(defaultValue = "10") @Min(1) Integer size) {
+    public ResponseEntity<List<CategoryDto>> getCategories(@RequestParam(defaultValue = "0") @Min(0) Integer from,
+                                              @RequestParam(defaultValue = "10") @Min(1) Integer size) {
         log.info("Получить категории: from: {},size: {}", from, size);
 
         return ResponseEntity.status(HttpStatus.OK)

@@ -10,13 +10,14 @@ import ru.practicum.service.event.repository.EventRepository;
 import ru.practicum.service.exceptions.NotFoundException;
 import ru.practicum.service.exceptions.ValidationException;
 import ru.practicum.service.request.dto.RequestDto;
-import ru.practicum.service.request.dto.RequestListDto;
 import ru.practicum.service.request.dto.RequestMapper;
 import ru.practicum.service.request.model.Request;
 import ru.practicum.service.request.model.RequestStatus;
 import ru.practicum.service.request.repository.RequestRepository;
 import ru.practicum.service.user.model.User;
 import ru.practicum.service.user.repository.UserRepository;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -34,14 +35,14 @@ public class RequestServiceImp implements RequestService {
         User requester = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id=" + userId + " не найдено"));
         validateCreatingRequest(event, userId);
+        int eventConfirmedRequests = requestRepository.
+                findAllByEventIsAndStatusIs(event, RequestStatus.CONFIRMED).size();
 
-        if (event.getParticipantLimit() == 0 || event.getParticipantLimit() > event.getConfirmedRequests()) {
+        if (event.getParticipantLimit() == 0 || event.getParticipantLimit() > eventConfirmedRequests) {
             Request newRequest = prepareRequest(event, requester);
 
             if (!event.getRequestModeration()) {
                 newRequest.setStatus(RequestStatus.CONFIRMED);
-                event.setConfirmedRequests(event.getConfirmedRequests() + 1);
-                eventRepository.save(event);
             } else {
                 newRequest.setStatus(RequestStatus.PENDING);
             }
@@ -53,12 +54,10 @@ public class RequestServiceImp implements RequestService {
 
     @Override
     @Transactional(readOnly = true)
-    public RequestListDto getUserRequests(Long userId) {
+    public List<RequestDto> getUserRequests(Long userId) {
         if (userRepository.existsById(userId)) {
-            return RequestListDto.builder()
-                    .requests(requestMapper.mapToRequestDtoList(
-                            requestRepository.findAllByRequesterUserId(userId)))
-                    .build();
+            return requestMapper.mapToRequestDtoList(
+                            requestRepository.findAllByRequesterUserId(userId));
         } else {
             throw new NotFoundException("Пользователь с id=" + userId + " не найдено");
         }
@@ -73,12 +72,9 @@ public class RequestServiceImp implements RequestService {
 
         Request request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Запрос с id=" + requestId + " не найден"));
-        Event event = request.getEvent();
 
         if (request.getStatus().equals(RequestStatus.CONFIRMED)) {
-            event.setConfirmedRequests(event.getConfirmedRequests() - 1);
             request.setStatus(RequestStatus.CANCELED);
-            eventRepository.save(event);
         } else {
             request.setStatus(RequestStatus.CANCELED);
         }

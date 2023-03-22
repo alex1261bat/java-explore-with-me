@@ -9,16 +9,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.service.event.dto.EventDto;
-import ru.practicum.service.event.dto.ListEventShortDto;
+import ru.practicum.service.event.dto.EventShortDto;
 import ru.practicum.service.event.dto.NewEventDto;
 import ru.practicum.service.event.dto.UpdateEventRequestDto;
 import ru.practicum.service.event.service.EventService;
 import ru.practicum.service.request.dto.EventRequestStatusUpdateDto;
 import ru.practicum.service.request.dto.EventRequestStatusUpdateResultDto;
-import ru.practicum.service.request.dto.RequestListDto;
+import ru.practicum.service.request.dto.RequestDto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -37,9 +38,9 @@ public class PrivateEventController {
     }
 
     @GetMapping("{userId}/events")
-    public ResponseEntity<ListEventShortDto> getUserEvents(@RequestParam(defaultValue = "0") @Min(0) Integer from,
-                                                           @RequestParam(defaultValue = "10") @Min(1) Integer size,
-                                                           @PathVariable @Min(1) Long userId) {
+    public ResponseEntity<List<EventShortDto>> getUserEvents(@RequestParam(defaultValue = "0") @Min(0) Integer from,
+                                                             @RequestParam(defaultValue = "10") @Min(1) Integer size,
+                                                             @PathVariable @Min(1) Long userId) {
         log.info("Получить события пользователя с userId={}, from: {},size: {}", userId, from, size);
 
         return ResponseEntity.status(HttpStatus.OK)
@@ -64,8 +65,8 @@ public class PrivateEventController {
     }
 
     @GetMapping("{userId}/events/{eventId}/requests")
-    public ResponseEntity<RequestListDto> getUserEventRequests(@PathVariable @Min(1) Long userId,
-                                                               @PathVariable @Min(1) Long eventId) {
+    public ResponseEntity<List<RequestDto>> getUserEventRequests(@PathVariable @Min(1) Long userId,
+                                                                 @PathVariable @Min(1) Long eventId) {
         log.info("Получить запросов для userId={} и eventId={}", userId, eventId);
 
         return ResponseEntity.status(HttpStatus.OK).body(eventService.getUserEventRequests(userId, eventId));

@@ -8,10 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.service.request.dto.RequestDto;
-import ru.practicum.service.request.dto.RequestListDto;
 import ru.practicum.service.request.service.RequestService;
 
 import javax.validation.constraints.Min;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -30,7 +30,7 @@ public class RequestController {
     }
 
     @GetMapping("{userId}/requests")
-    public ResponseEntity<RequestListDto> getUserRequests(@PathVariable @Min(1) Long userId) {
+    public ResponseEntity<List<RequestDto>> getUserRequests(@PathVariable @Min(1) Long userId) {
         log.info("Получение запроса с userId={}", userId);
 
         return ResponseEntity.status(HttpStatus.OK).body(requestService.getUserRequests(userId));

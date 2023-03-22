@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.service.category.model.Category;
 import ru.practicum.service.category.repository.CategoryRepository;
 import ru.practicum.service.event.dto.*;
-import ru.practicum.service.event.dto.*;
 import ru.practicum.service.event.model.Event;
 import ru.practicum.service.event.model.State;
 import ru.practicum.service.event.model.EventStateAction;
@@ -25,7 +24,6 @@ import ru.practicum.service.request.model.RequestStatus;
 import ru.practicum.service.request.repository.RequestRepository;
 import ru.practicum.service.user.model.User;
 import ru.practicum.service.user.repository.UserRepository;
-import ru.practicum.service.request.dto.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -70,12 +68,10 @@ public class EventServiceImp implements EventService {
 
     @Override
     @Transactional(readOnly = true)
-    public ListEventShortDto getPrivateUserEvents(Long userId, Pageable pageable) {
+    public List<EventShortDto> getPrivateUserEvents(Long userId, Pageable pageable) {
         if (userRepository.existsById(userId)) {
-            return ListEventShortDto.builder()
-                    .events(eventMapper.mapToListEventShortDto(
-                            eventRepository.findAllByInitiatorUserId(userId, pageable)))
-                    .build();
+            return eventMapper.mapToListEventShortDto(
+                            eventRepository.findAllByInitiatorUserId(userId, pageable));
         } else {
             throw new NotFoundException("Пользователь с id=" + userId + " не найден");
         }
@@ -130,9 +126,9 @@ public class EventServiceImp implements EventService {
 
     @Override
     @Transactional(readOnly = true)
-    public ListEventDto getEventsByFiltersForAdmin(List<Long> ids, List<String> states, List<Long> categories,
-                                                   LocalDateTime rangeStart, LocalDateTime rangeEnd,
-                                                   Pageable pageable) {
+    public List<EventDto> getEventsByFiltersForAdmin(List<Long> ids, List<String> states, List<Long> categories,
+                                                     LocalDateTime rangeStart, LocalDateTime rangeEnd,
+                                                     Pageable pageable) {
         BooleanBuilder booleanBuilder = createQuery(ids, states, categories, rangeStart, rangeEnd);
         Page<Event> page;
 
@@ -142,9 +138,7 @@ public class EventServiceImp implements EventService {
             page = eventRepository.findAll(pageable);
         }
 
-        return ListEventDto.builder()
-                .events(eventMapper.mapToListEventDto(page.getContent()))
-                .build();
+        return eventMapper.mapToListEventDto(page.getContent());
     }
 
     @Override
@@ -176,15 +170,13 @@ public class EventServiceImp implements EventService {
 
     @Override
     @Transactional(readOnly = true)
-    public RequestListDto getUserEventRequests(Long userId, Long eventId) {
+    public List<RequestDto> getUserEventRequests(Long userId, Long eventId) {
         if (userRepository.existsById(userId)) {
             Event event = eventRepository.findByEventIdAndInitiatorUserId(eventId, userId)
                     .orElseThrow(() -> new NotFoundException("Событие с id=" + eventId + " не найдено"));
 
-            return RequestListDto.builder()
-                    .requests(event.getRequests().stream()
-                            .map(requestMapper::mapToRequestDto).collect(Collectors.toList()))
-                    .build();
+            return requestRepository.findAllByEventIs(event).stream()
+                            .map(requestMapper::mapToRequestDto).collect(Collectors.toList());
         } else {
             throw new NotFoundException("Пользователь с id=" + userId + " не найден");
         }
@@ -198,7 +190,8 @@ public class EventServiceImp implements EventService {
             Event event = eventRepository.findByEventIdAndInitiatorUserId(eventId, userId)
                     .orElseThrow(() -> new NotFoundException("Событие с id=" + eventId + " не найдено"));
 
-            if (event.getParticipantLimit() <= event.getConfirmedRequests()) {
+            if (event.getParticipantLimit() <= requestRepository.
+                    findAllByEventIsAndStatusIs(event, RequestStatus.CONFIRMED).size()) {
                 throw new ValidationException("Лимит участников достигнут");
             }
 
@@ -221,17 +214,19 @@ public class EventServiceImp implements EventService {
         serviceStatsClient.postStatistic(httpServletRequest, "ewm-service");
         Event event = eventRepository.findByEventIdAndState(eventId, State.PUBLISHED)
                 .orElseThrow(() -> new NotFoundException("Событие с id=" + eventId + " не найдено"));
-        event.setViews(serviceStatsClient.getStatistic(eventId));
+        EventDto eventDto = eventMapper.mapToEventDto(eventRepository.save(event));
 
-        return eventMapper.mapToEventDto(eventRepository.save(event));
+        eventDto.setViews(serviceStatsClient.getStatistic(eventId));
+
+        return eventDto;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public ListEventShortDto getEventsByFiltersPublic(String text, List<Long> categories, Boolean paid,
-                                                      LocalDateTime rangeStart, LocalDateTime rangeEnd,
-                                                      Boolean onlyAvailable, Pageable pageable,
-                                                      HttpServletRequest httpServletRequest) {
+    public List<EventShortDto> getEventsByFiltersPublic(String text, List<Long> categories, Boolean paid,
+                                                        LocalDateTime rangeStart, LocalDateTime rangeEnd,
+                                                        Boolean onlyAvailable, Pageable pageable,
+                                                        HttpServletRequest httpServletRequest) {
         serviceStatsClient.postStatistic(httpServletRequest, "ewm-service");
         BooleanBuilder booleanBuilder = createQuery(null, null, categories, rangeStart, rangeEnd);
         Page<Event> page;
@@ -246,8 +241,7 @@ public class EventServiceImp implements EventService {
         }
 
         if (onlyAvailable) {
-            booleanBuilder.and((QEvent.event.participantLimit.eq(0)))
-                    .or(QEvent.event.participantLimit.gt(QEvent.event.confirmedRequests));
+            booleanBuilder.and((QEvent.event.participantLimit.eq(0)));
         }
 
         if (paid != null) {
@@ -260,9 +254,12 @@ public class EventServiceImp implements EventService {
             page = eventRepository.findAll(pageable);
         }
 
-        return ListEventShortDto.builder()
-                .events(eventMapper.mapToListEventShortDto(page.getContent()))
-                .build();
+        List<EventShortDto> eventShortDtoList = eventMapper.mapToListEventShortDto(page.getContent());
+
+        eventShortDtoList.forEach(eventShortDto ->
+                eventShortDto.setViews(serviceStatsClient.getStatistic(eventShortDto.getId())));
+
+        return eventShortDtoList;
     }
 
     private BooleanBuilder createQuery(List<Long> ids, List<String> states, List<Long> categories,
@@ -300,20 +297,20 @@ public class EventServiceImp implements EventService {
     private void moderateRequests(List<RequestDto> confirmedRequests,
                                   List<RequestDto> rejectedRequests,
                                   Event event, EventRequestStatusUpdateDto requests) {
+        int eventConfirmedRequests = requestRepository.
+                findAllByEventIsAndStatusIs(event, RequestStatus.CONFIRMED).size();
+
         requestRepository.findAllByRequestIdIn(requests.getRequestIds()).stream()
                 .peek(request -> {
                     if (request.getStatus().equals(RequestStatus.PENDING)) {
                         if (event.getParticipantLimit() == 0) {
                             request.setStatus(RequestStatus.CONFIRMED);
-                            event.setConfirmedRequests(event.getConfirmedRequests() + 1);
-                        } else if (event.getParticipantLimit() > event.getConfirmedRequests()) {
+                        } else if (event.getParticipantLimit() > eventConfirmedRequests) {
                             if (!event.getRequestModeration()) {
                                 request.setStatus(RequestStatus.CONFIRMED);
-                                event.setConfirmedRequests(event.getConfirmedRequests() + 1);
                             } else {
                                 if (requests.getStatus().equals(RequestStatus.CONFIRMED.toString())) {
                                     request.setStatus(RequestStatus.CONFIRMED);
-                                    event.setConfirmedRequests(event.getConfirmedRequests() + 1);
                                 } else {
                                     request.setStatus(RequestStatus.REJECTED);
                                 }
@@ -329,8 +326,10 @@ public class EventServiceImp implements EventService {
                 .forEach(requestDto -> {
                     if (requestDto.getStatus().equals(RequestStatus.CONFIRMED)) {
                         confirmedRequests.add(requestDto);
+                        requestRepository.save(requestMapper.mapToRequest(requestDto));
                     } else {
                         rejectedRequests.add(requestDto);
+                        requestRepository.save(requestMapper.mapToRequest(requestDto));
                     }
                 });
     }

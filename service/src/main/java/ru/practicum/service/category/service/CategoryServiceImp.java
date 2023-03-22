@@ -6,10 +6,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.service.category.dto.CategoryDto;
-import ru.practicum.service.category.dto.CategoryListDto;
 import ru.practicum.service.category.dto.CategoryMapper;
 import ru.practicum.service.category.repository.CategoryRepository;
 import ru.practicum.service.exceptions.NotFoundException;
+
+import java.util.List;
 
 
 @Service
@@ -46,10 +47,8 @@ public class CategoryServiceImp implements CategoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public CategoryListDto getCategories(Pageable pageable) {
-        return CategoryListDto.builder()
-                .catList(categoryMapper.mapToListCategories(categories.findAll(pageable)))
-                .build();
+    public List<CategoryDto> getCategories(Pageable pageable) {
+        return categoryMapper.mapToListCategories(categories.findAll(pageable));
     }
 
     @Override

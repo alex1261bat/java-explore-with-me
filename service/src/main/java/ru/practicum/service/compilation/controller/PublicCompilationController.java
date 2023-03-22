@@ -8,11 +8,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.service.compilation.dto.CompilationListDto;
 import ru.practicum.service.compilation.dto.CompilationResponseDto;
 import ru.practicum.service.compilation.service.CompilationService;
 
 import javax.validation.constraints.Min;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -30,9 +30,9 @@ public class PublicCompilationController {
     }
 
     @GetMapping
-    public ResponseEntity<CompilationListDto> getCompilations(@RequestParam(required = false) Boolean pinned,
-                                                              @RequestParam(defaultValue = "10") @Min(1) Integer size,
-                                                              @RequestParam(defaultValue = "0") @Min(0) Integer from) {
+    public ResponseEntity<List<CompilationResponseDto>> getCompilations(@RequestParam(required = false) Boolean pinned,
+                                                @RequestParam(defaultValue = "10") @Min(1) Integer size,
+                                                @RequestParam(defaultValue = "0") @Min(0) Integer from) {
         log.info("Получение списка компиляций");
 
         return ResponseEntity.status(HttpStatus.OK)

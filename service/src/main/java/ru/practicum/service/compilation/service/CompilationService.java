@@ -1,10 +1,11 @@
 package ru.practicum.service.compilation.service;
 
 import org.springframework.data.domain.Pageable;
-import ru.practicum.service.compilation.dto.CompilationListDto;
 import ru.practicum.service.compilation.dto.CompilationResponseDto;
 import ru.practicum.service.compilation.dto.NewCompilationDto;
 import ru.practicum.service.compilation.dto.UpdateCompilationRequestDto;
+
+import java.util.List;
 
 public interface CompilationService {
     CompilationResponseDto addCompilation(NewCompilationDto compilationDto);
@@ -15,5 +16,5 @@ public interface CompilationService {
 
     CompilationResponseDto getCompilation(Long compId);
 
-    CompilationListDto getCompilations(Boolean pinned, Pageable pageable);
+    List<CompilationResponseDto> getCompilations(Boolean pinned, Pageable pageable);
 }

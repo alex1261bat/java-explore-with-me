@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.service.user.dto.UserDto;
-import ru.practicum.service.user.dto.UserListDto;
 import ru.practicum.service.user.service.UserService;
 
 import javax.validation.Valid;
@@ -32,7 +31,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<UserListDto> getUsers(@RequestParam(required = false) List<Long> ids,
+    public ResponseEntity<List<UserDto>> getUsers(@RequestParam(required = false) List<Long> ids,
                                                 @RequestParam(defaultValue = "0") @Min(0) Integer from,
                                                 @RequestParam(defaultValue = "10") @Min(1) Integer size) {
         log.info("Получение пользователей из списков: ids: {}, from: {},size: {}", ids, from, size);

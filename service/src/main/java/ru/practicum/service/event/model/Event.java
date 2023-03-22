@@ -3,13 +3,10 @@ package ru.practicum.service.event.model;
 import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.service.category.model.Category;
-import ru.practicum.service.compilation.model.Compilation;
-import ru.practicum.service.request.model.Request;
 import ru.practicum.service.user.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -39,8 +36,6 @@ public class Event {
     private Boolean requestModeration = Boolean.TRUE;
     @Column(name = "TITLE", nullable = false)
     private String title;
-    @Column(name = "CONFIRMED_REQUESTS")
-    private Integer confirmedRequests = 0;
     @Column(name = "CREATED_ON", nullable = false)
     private LocalDateTime createdOn;
     @ManyToOne
@@ -51,10 +46,4 @@ public class Event {
     @Enumerated(EnumType.STRING)
     @Column(name = "STATE")
     private State state = State.PENDING;
-    @Column(name = "VIEWS")
-    private Long views = 0L;
-    @OneToMany(mappedBy = "event")
-    private Set<Request> requests;
-    @ManyToMany(mappedBy = "events")
-    private Set<Compilation> compilations;
 }
