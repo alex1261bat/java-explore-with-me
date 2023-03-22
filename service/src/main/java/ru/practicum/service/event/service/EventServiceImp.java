@@ -190,8 +190,8 @@ public class EventServiceImp implements EventService {
             Event event = eventRepository.findByEventIdAndInitiatorUserId(eventId, userId)
                     .orElseThrow(() -> new NotFoundException("Событие с id=" + eventId + " не найдено"));
 
-            if (event.getParticipantLimit() <= requestRepository.
-                    findAllByEventIsAndStatusIs(event, RequestStatus.CONFIRMED).size()) {
+            if (event.getParticipantLimit() <= requestRepository
+                    .findAllByEventIsAndStatusIs(event, RequestStatus.CONFIRMED).size()) {
                 throw new ValidationException("Лимит участников достигнут");
             }
 
@@ -297,8 +297,8 @@ public class EventServiceImp implements EventService {
     private void moderateRequests(List<RequestDto> confirmedRequests,
                                   List<RequestDto> rejectedRequests,
                                   Event event, EventRequestStatusUpdateDto requests) {
-        int eventConfirmedRequests = requestRepository.
-                findAllByEventIsAndStatusIs(event, RequestStatus.CONFIRMED).size();
+        int eventConfirmedRequests = requestRepository
+                .findAllByEventIsAndStatusIs(event, RequestStatus.CONFIRMED).size();
 
         requestRepository.findAllByRequestIdIn(requests.getRequestIds()).stream()
                 .peek(request -> {

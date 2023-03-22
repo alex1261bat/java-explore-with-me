@@ -20,5 +20,6 @@ public interface RequestMapper {
     @Mapping(source = "requester", target = "requester.userId")
     @Mapping(source = "id", target = "requestId")
     Request mapToRequest(RequestDto requestDto);
+
     List<RequestDto> mapToRequestDtoList(List<Request> requests);
 }

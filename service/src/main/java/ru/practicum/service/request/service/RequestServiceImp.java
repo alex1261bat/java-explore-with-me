@@ -35,8 +35,8 @@ public class RequestServiceImp implements RequestService {
         User requester = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id=" + userId + " не найдено"));
         validateCreatingRequest(event, userId);
-        int eventConfirmedRequests = requestRepository.
-                findAllByEventIsAndStatusIs(event, RequestStatus.CONFIRMED).size();
+        int eventConfirmedRequests = requestRepository
+                .findAllByEventIsAndStatusIs(event, RequestStatus.CONFIRMED).size();
 
         if (event.getParticipantLimit() == 0 || event.getParticipantLimit() > eventConfirmedRequests) {
             Request newRequest = prepareRequest(event, requester);
