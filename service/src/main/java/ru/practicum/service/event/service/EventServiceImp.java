@@ -246,9 +246,7 @@ public class EventServiceImp implements EventService {
         }
 
         if (onlyAvailable) {
-            booleanBuilder.and((QEvent.event.participantLimit.eq(0)))
-                    .or(QEvent.event.participantLimit.gt((int) requestList.stream()
-                            .filter(request -> request.getEvent().getEventId().equals(QEvent.event.eventId)).count()));
+            booleanBuilder.and((QEvent.event.participantLimit.eq(0)));
         }
 
         if (paid != null) {
