@@ -245,10 +245,6 @@ public class EventServiceImp implements EventService {
             booleanBuilder.and(QEvent.event.eventDate.after(LocalDateTime.now()));
         }
 
-        if (onlyAvailable) {
-            booleanBuilder.and((QEvent.event.participantLimit.eq(0)));
-        }
-
         if (paid != null) {
             booleanBuilder.and(QEvent.event.paid.eq(paid));
         }
@@ -259,9 +255,36 @@ public class EventServiceImp implements EventService {
             page = eventRepository.findAll(pageable);
         }
 
-        return eventMapper.mapToListEventShortDto(page.getContent()).stream()
-                .peek(eventShortDto -> eventShortDto.setViews(serviceStatsClient.getStatistic(eventShortDto.getId())))
+        List<Event> eventList = page.getContent();
+        List<EventShortDto> eventShortDtoList = eventMapper.mapToListEventShortDto(eventList).stream()
+                .peek(eventShortDto -> {
+                    eventShortDto.setViews(serviceStatsClient.getStatistic(eventShortDto.getId()));
+                    eventShortDto.setConfirmedRequests((int) requestList.stream()
+                            .filter(request -> request.getEvent().getEventId().equals(eventShortDto.getId())).count());
+                })
                 .collect(Collectors.toList());
+
+        if (onlyAvailable) {
+            return findOnlyAvailable(eventShortDtoList, eventList);
+        } else {
+            return eventShortDtoList;
+        }
+    }
+
+    private List<EventShortDto> findOnlyAvailable(List<EventShortDto> eventShortDtoList, List<Event> eventList) {
+        List<EventShortDto> eventShortDtos = new ArrayList<>();
+
+        eventShortDtoList.forEach(eventShortDto -> {
+            for (Event event : eventList) {
+                if (eventShortDto.getId().equals(event.getEventId())
+                        && (event.getParticipantLimit() == 0
+                        || (event.getParticipantLimit() > eventShortDto.getConfirmedRequests()))) {
+                        eventShortDtos.add(eventShortDto);
+                }
+            }
+        });
+
+        return eventShortDtos;
     }
 
     private BooleanBuilder createQuery(List<Long> ids, List<String> states, List<Long> categories,
