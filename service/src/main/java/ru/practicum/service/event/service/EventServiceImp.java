@@ -12,14 +12,18 @@ import ru.practicum.service.category.model.Category;
 import ru.practicum.service.category.repository.CategoryRepository;
 import ru.practicum.service.event.dto.*;
 import ru.practicum.service.event.model.Event;
-import ru.practicum.service.event.model.State;
 import ru.practicum.service.event.model.EventStateAction;
 import ru.practicum.service.event.model.QEvent;
+import ru.practicum.service.event.model.State;
 import ru.practicum.service.event.repository.EventRepository;
 import ru.practicum.service.event.statsClient.ServiceStatsClient;
 import ru.practicum.service.exceptions.NotFoundException;
 import ru.practicum.service.exceptions.ValidationException;
-import ru.practicum.service.request.dto.*;
+import ru.practicum.service.request.dto.EventRequestStatusUpdateDto;
+import ru.practicum.service.request.dto.EventRequestStatusUpdateResultDto;
+import ru.practicum.service.request.dto.RequestDto;
+import ru.practicum.service.request.dto.RequestMapper;
+import ru.practicum.service.request.model.Request;
 import ru.practicum.service.request.model.RequestStatus;
 import ru.practicum.service.request.repository.RequestRepository;
 import ru.practicum.service.user.model.User;
@@ -230,6 +234,7 @@ public class EventServiceImp implements EventService {
         serviceStatsClient.postStatistic(httpServletRequest, "ewm-service");
         BooleanBuilder booleanBuilder = createQuery(null, null, categories, rangeStart, rangeEnd);
         Page<Event> page;
+        List<Request> requestList = requestRepository.findAllByStatusIs(RequestStatus.CONFIRMED);
 
         if (text != null) {
             booleanBuilder.and(QEvent.event.annotation.likeIgnoreCase(text))
@@ -241,7 +246,9 @@ public class EventServiceImp implements EventService {
         }
 
         if (onlyAvailable) {
-            booleanBuilder.and((QEvent.event.participantLimit.eq(0)));
+            booleanBuilder.and((QEvent.event.participantLimit.eq(0)))
+                    .or(QEvent.event.participantLimit.gt((int) requestList.stream()
+                            .filter(request -> request.getEvent().getEventId().equals(QEvent.event.eventId)).count()));
         }
 
         if (paid != null) {
@@ -254,12 +261,9 @@ public class EventServiceImp implements EventService {
             page = eventRepository.findAll(pageable);
         }
 
-        List<EventShortDto> eventShortDtoList = eventMapper.mapToListEventShortDto(page.getContent());
-
-        eventShortDtoList.forEach(eventShortDto ->
-                eventShortDto.setViews(serviceStatsClient.getStatistic(eventShortDto.getId())));
-
-        return eventShortDtoList;
+        return eventMapper.mapToListEventShortDto(page.getContent()).stream()
+                .peek(eventShortDto -> eventShortDto.setViews(serviceStatsClient.getStatistic(eventShortDto.getId())))
+                .collect(Collectors.toList());
     }
 
     private BooleanBuilder createQuery(List<Long> ids, List<String> states, List<Long> categories,
@@ -305,18 +309,25 @@ public class EventServiceImp implements EventService {
                     if (request.getStatus().equals(RequestStatus.PENDING)) {
                         if (event.getParticipantLimit() == 0) {
                             request.setStatus(RequestStatus.CONFIRMED);
+                            requestRepository.save(request);
                         } else if (event.getParticipantLimit() > eventConfirmedRequests) {
                             if (!event.getRequestModeration()) {
                                 request.setStatus(RequestStatus.CONFIRMED);
+                                requestRepository.save(request);
+                                event.setParticipantLimit(event.getParticipantLimit() - 1);
+                                eventRepository.save(event);
                             } else {
                                 if (requests.getStatus().equals(RequestStatus.CONFIRMED.toString())) {
                                     request.setStatus(RequestStatus.CONFIRMED);
+                                    requestRepository.save(request);
                                 } else {
                                     request.setStatus(RequestStatus.REJECTED);
+                                    requestRepository.save(request);
                                 }
                             }
                         } else {
                             request.setStatus(RequestStatus.REJECTED);
+                            requestRepository.save(request);
                         }
                     } else {
                         throw new ValidationException("Может только подтверждать PENDING запросы");
@@ -326,10 +337,8 @@ public class EventServiceImp implements EventService {
                 .forEach(requestDto -> {
                     if (requestDto.getStatus().equals(RequestStatus.CONFIRMED)) {
                         confirmedRequests.add(requestDto);
-                        requestRepository.save(requestMapper.mapToRequest(requestDto));
                     } else {
                         rejectedRequests.add(requestDto);
-                        requestRepository.save(requestMapper.mapToRequest(requestDto));
                     }
                 });
     }
