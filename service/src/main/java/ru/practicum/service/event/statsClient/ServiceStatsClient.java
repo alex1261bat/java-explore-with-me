@@ -54,4 +54,17 @@ public class ServiceStatsClient extends StatsClient {
         List<StatisticDto> statisticDtoList = response.hasBody() ? response.getBody() : null;
         return statisticDtoList != null && !statisticDtoList.isEmpty() ? statisticDtoList.get(0).getHits() : 0L;
     }
+
+    public List<StatisticDto> getAllStatistic() {
+        String url = "/stats?start={start}&end={end}&uris={uris}&unique={unique}";
+        Map<String, Object> parameters = Map.of(
+                "start", LocalDateTime.now().minusYears(100).format(formatter),
+                "end", LocalDateTime.now().format(formatter),
+                "uris", "/events/" + null,
+                "unique", "false"
+        );
+        ResponseEntity<List<StatisticDto>> response = get(url, parameters);
+
+        return response.hasBody() ? response.getBody() : null;
+    }
 }

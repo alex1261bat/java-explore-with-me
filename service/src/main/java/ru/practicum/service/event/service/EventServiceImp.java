@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.dto.StatisticDto;
 import ru.practicum.service.category.model.Category;
 import ru.practicum.service.category.repository.CategoryRepository;
 import ru.practicum.service.event.dto.*;
@@ -34,6 +35,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
@@ -258,7 +260,7 @@ public class EventServiceImp implements EventService {
         List<Event> eventList = page.getContent();
         List<EventShortDto> eventShortDtoList = eventMapper.mapToListEventShortDto(eventList).stream()
                 .peek(eventShortDto -> {
-                    eventShortDto.setViews(serviceStatsClient.getStatistic(eventShortDto.getId()));
+                    eventShortDto.setViews(getEventViews(eventShortDto.getId()));
                     eventShortDto.setConfirmedRequests((int) requestList.stream()
                             .filter(request -> request.getEvent().getEventId().equals(eventShortDto.getId())).count());
                 })
@@ -271,6 +273,20 @@ public class EventServiceImp implements EventService {
         }
     }
 
+    private long getEventViews(Long eventId) {
+        List<StatisticDto> statisticDtoList = serviceStatsClient.getAllStatistic();
+        long views = 0L;
+
+        if (statisticDtoList != null && !statisticDtoList.isEmpty()) {
+            views = statisticDtoList.stream()
+                    .filter(statisticDto -> statisticDto.getUri().contains(eventId.toString()))
+                    .collect(Collectors.toList())
+                    .get(0)
+                    .getHits();
+        }
+
+        return views;
+    }
     private List<EventShortDto> findOnlyAvailable(List<EventShortDto> eventShortDtoList, List<Event> eventList) {
         List<EventShortDto> eventShortDtos = new ArrayList<>();
 
@@ -322,8 +338,8 @@ public class EventServiceImp implements EventService {
     private void moderateRequests(List<RequestDto> confirmedRequests,
                                   List<RequestDto> rejectedRequests,
                                   Event event, EventRequestStatusUpdateDto requests) {
-        int eventConfirmedRequests = requestRepository
-                .findAllByEventIsAndStatusIs(event, RequestStatus.CONFIRMED).size();
+        AtomicInteger eventConfirmedRequests = new AtomicInteger(requestRepository
+                .findAllByEventIsAndStatusIs(event, RequestStatus.CONFIRMED).size());
 
         requestRepository.findAllByRequestIdIn(requests.getRequestIds()).stream()
                 .peek(request -> {
@@ -331,16 +347,16 @@ public class EventServiceImp implements EventService {
                         if (event.getParticipantLimit() == 0) {
                             request.setStatus(RequestStatus.CONFIRMED);
                             requestRepository.save(request);
-                        } else if (event.getParticipantLimit() > eventConfirmedRequests) {
+                        } else if (event.getParticipantLimit() > eventConfirmedRequests.get()) {
                             if (!event.getRequestModeration()) {
                                 request.setStatus(RequestStatus.CONFIRMED);
                                 requestRepository.save(request);
-                                event.setParticipantLimit(event.getParticipantLimit() - 1);
-                                eventRepository.save(event);
+                                eventConfirmedRequests.set(eventConfirmedRequests.get() + 1);
                             } else {
                                 if (requests.getStatus().equals(RequestStatus.CONFIRMED.toString())) {
                                     request.setStatus(RequestStatus.CONFIRMED);
                                     requestRepository.save(request);
+                                    eventConfirmedRequests.set(eventConfirmedRequests.get() + 1);
                                 } else {
                                     request.setStatus(RequestStatus.REJECTED);
                                     requestRepository.save(request);
