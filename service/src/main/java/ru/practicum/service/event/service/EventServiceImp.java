@@ -287,6 +287,7 @@ public class EventServiceImp implements EventService {
 
         return views;
     }
+
     private List<EventShortDto> findOnlyAvailable(List<EventShortDto> eventShortDtoList, List<Event> eventList) {
         List<EventShortDto> eventShortDtos = new ArrayList<>();
 
