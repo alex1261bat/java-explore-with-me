@@ -31,7 +31,7 @@ public class StatisticService {
     @NotNull
     @Transactional(readOnly = true)
     public List<StatisticDto> getStatistic(@NotNull String start, @NotNull String end,
-                                           String[] uris, @NotNull Boolean unique) {
+                                           List<String> uris, @NotNull Boolean unique) {
         LocalDateTime parseStart = LocalDateTime.parse(start, formatter);
         LocalDateTime parseEnd = LocalDateTime.parse(end, formatter);
 

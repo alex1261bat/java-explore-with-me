@@ -42,7 +42,7 @@ public class ServiceStatsClient extends StatsClient {
         post("/hit", hit);
     }
 
-    public Long getStatistic(Long eventId) {
+    public Long getEventStatistic(Long eventId) {
         String url = "/stats?start={start}&end={end}&uris={uris}&unique={unique}";
         Map<String, Object> parameters = Map.of(
                 "start", LocalDateTime.now().minusYears(100).format(formatter),
@@ -55,12 +55,12 @@ public class ServiceStatsClient extends StatsClient {
         return statisticDtoList != null && !statisticDtoList.isEmpty() ? statisticDtoList.get(0).getHits() : 0L;
     }
 
-    public List<StatisticDto> getAllStatistic() {
+    public List<StatisticDto> getEventListStatistic(List<String> uris) {
         String url = "/stats?start={start}&end={end}&uris={uris}&unique={unique}";
         Map<String, Object> parameters = Map.of(
                 "start", LocalDateTime.now().minusYears(100).format(formatter),
                 "end", LocalDateTime.now().format(formatter),
-                "uris", "/events/" + null,
+                "uris",  uris,
                 "unique", "false"
         );
         ResponseEntity<List<StatisticDto>> response = get(url, parameters);

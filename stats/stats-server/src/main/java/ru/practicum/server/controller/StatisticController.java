@@ -33,7 +33,7 @@ public class StatisticController {
     @GetMapping("/stats")
     public List<StatisticDto> getStat(@NotEmpty @DateValidator @RequestParam String start,
                                       @NotEmpty @DateValidator @RequestParam String end,
-                                      @RequestParam(required = false) String[] uris,
+                                      @RequestParam(required = false) List<String> uris,
                                       @RequestParam(defaultValue = "false") Boolean unique) {
         log.info("Запрос на получение статистики");
 

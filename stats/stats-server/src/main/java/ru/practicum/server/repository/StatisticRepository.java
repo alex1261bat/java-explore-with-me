@@ -29,7 +29,7 @@ public interface StatisticRepository extends JpaRepository<HitEndpoint, Long> {
             "ORDER BY COUNT(h.ip) DESC")
     List<StatisticDto> getUrisStat(@Param("start") LocalDateTime start,
                                    @Param("end") LocalDateTime end,
-                                   @Param("uris") String[] uris);
+                                   @Param("uris") List<String> uris);
 
     @Query("SELECT new ru.practicum.dto.StatisticDto(h.app, h.uri, COUNT(DISTINCT h.ip)) " +
             "FROM HitEndpoint AS h " +
@@ -47,5 +47,5 @@ public interface StatisticRepository extends JpaRepository<HitEndpoint, Long> {
             "ORDER BY COUNT(DISTINCT h.ip) DESC")
     List<StatisticDto> getUniqueUrisStat(@Param("start") LocalDateTime start,
                                          @Param("end") LocalDateTime end,
-                                         @Param("uris") String[] uris);
+                                         @Param("uris") List<String> uris);
 }

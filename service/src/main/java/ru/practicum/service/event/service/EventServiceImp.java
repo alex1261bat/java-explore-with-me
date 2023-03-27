@@ -34,7 +34,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -222,7 +224,7 @@ public class EventServiceImp implements EventService {
                 .orElseThrow(() -> new NotFoundException("Событие с id=" + eventId + " не найдено"));
         EventDto eventDto = eventMapper.mapToEventDto(eventRepository.save(event));
 
-        eventDto.setViews(serviceStatsClient.getStatistic(eventId));
+        eventDto.setViews(serviceStatsClient.getEventStatistic(eventId));
 
         return eventDto;
     }
@@ -258,9 +260,12 @@ public class EventServiceImp implements EventService {
         }
 
         List<Event> eventList = page.getContent();
+        List<String> eventListUris = createUriForEventList(eventList);
+        Map<Long, Long> eventViews = getEventViews(eventListUris, eventList);
+
         List<EventShortDto> eventShortDtoList = eventMapper.mapToListEventShortDto(eventList).stream()
                 .peek(eventShortDto -> {
-                    eventShortDto.setViews(getEventViews(eventShortDto.getId()));
+                    eventShortDto.setViews(eventViews.get(eventShortDto.getId()));
                     eventShortDto.setConfirmedRequests((int) requestList.stream()
                             .filter(request -> request.getEvent().getEventId().equals(eventShortDto.getId())).count());
                 })
@@ -273,19 +278,30 @@ public class EventServiceImp implements EventService {
         }
     }
 
-    private long getEventViews(Long eventId) {
-        List<StatisticDto> statisticDtoList = serviceStatsClient.getAllStatistic();
-        long views = 0L;
+    private List<String> createUriForEventList(List<Event> eventList) {
+
+        return eventList.stream()
+                .map(event -> "/events/" + event.getEventId())
+                .collect(Collectors.toList());
+    }
+
+    private Map<Long, Long> getEventViews(List<String> uris, List<Event> eventList) {
+        List<StatisticDto> statisticDtoList = serviceStatsClient.getEventListStatistic(uris);
+        Map<Long, Long> eventViews = new HashMap<>();
 
         if (statisticDtoList != null && !statisticDtoList.isEmpty()) {
-            views = statisticDtoList.stream()
-                    .filter(statisticDto -> statisticDto.getUri().contains(eventId.toString()))
-                    .collect(Collectors.toList())
-                    .get(0)
-                    .getHits();
+            eventList.forEach(event -> {
+                long views = statisticDtoList.stream()
+                        .filter(statisticDto -> statisticDto.getUri().contains(event.getEventId().toString()))
+                        .collect(Collectors.toList())
+                        .get(0)
+                        .getHits();
+
+                eventViews.put(event.getEventId(), views);
+            });
         }
 
-        return views;
+        return eventViews;
     }
 
     private List<EventShortDto> findOnlyAvailable(List<EventShortDto> eventShortDtoList, List<Event> eventList) {
