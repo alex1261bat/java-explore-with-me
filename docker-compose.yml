@@ -1,59 +1,57 @@
-version: '3.1'
+version: '3.8'
 services:
   stats-server:
-    build: ./statistic/statistic-server
-    image: statistic-server
-    container_name: statistic-server
-    ports:
-      - "9090:9090"
+    build: ./stats/stats-server
+    image: ewm-stats-server-image
+    container_name: ewm-stats-server
     depends_on:
       - stats-db
+    ports:
+      - "9090:9090"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/postgres
-      - SPRING_DATASOURCE_USER=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
-      - DB_NAME=postgres
+      - DB_NAME=ewm-stats-db
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
       - DB_HOST=stats-db
-        DB_PORT=5432
+      - DB_PORT=5432
 
   stats-db:
-    image: postgres:14.6
-    container_name: statsDb
-    restart: always
-    volumes:
-      - /var/lib/postgresql/data
+    image: postgres:14-alpine
+    container_name: ewm-stats-db
     ports:
       - "6541:5432"
+    volumes:
+      - /ewm-stats-db
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=ewm-stats-db
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
 
   ewm-service:
-    build: ./main
-    image: main-service
-    container_name: main-service
-    ports:
-      - "8080:8080"
+    build: ./service
+    image: emw-service-image
+    container_name: emw-service
     depends_on:
       - stats-server
       - ewm-db
+    ports:
+      - "8080:8080"
     environment:
-      - application.name=main
-      - stats-server.url=http://stats-server:9090
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/emwDb
-      - SPRING_DATASOURCE_USER=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
-      - DB_NAME=emwDb
-      - DB_HOST=db
-        DB_PORT=5444
+      - DB_NAME=ewm-service-db
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - DB_HOST=ewm-db
+      - DB_PORT=5432
+      - STAT_SERVER_URL=http://stats-server:9090
 
   ewm-db:
     image: postgres:14-alpine
-    container_name: emwDb
+    container_name: ewm-service-db
     ports:
-      - "6540:5432"
+      - "6542:5432"
     environment:
-      - POSTGRES_DB=emwDb
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=ewm-service-db
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+    volumes:
+      - /ewm-service-db
