@@ -19,7 +19,7 @@
 									"pm.test(\"Данные в ответе должны соответствовать запросу\", () => {\r",
 									"    var body = pm.response.json();\r",
 									"\r",
-									"    pm.expect(body.id, '\"id\" field').eq(61);\r",
+									"    pm.expect(body.id, '\"id\" field').eq(64);\r",
 									"    pm.expect(body.name, '\"name\" field').eq('User1');\r",
 									"    pm.expect(body.email, '\"email\" field').eq('user1@hotmail.com')\r",
 									"})"
@@ -54,7 +54,7 @@
 									"pm.test(\"Данные в ответе должны соответствовать запросу\", () => {\r",
 									"    var body = pm.response.json();\r",
 									"\r",
-									"    pm.expect(body.id, '\"id\" field').eq(62);\r",
+									"    pm.expect(body.id, '\"id\" field').eq(65);\r",
 									"    pm.expect(body.name, '\"name\" field').eq('Bad user');\r",
 									"    pm.expect(body.email, '\"email\" field').eq('bad_user@hotmail.com')\r",
 									"})"
@@ -89,11 +89,11 @@
 									"pm.test(\"данные ответа не совпадают с ожидаемыми\", () => {\r",
 									"    var body = pm.response.json();\r",
 									"\r",
-									"    pm.expect(body[0].id, 'result[0]: \"id\" field').eq(61);\r",
+									"    pm.expect(body[0].id, 'result[0]: \"id\" field').eq(64);\r",
 									"    pm.expect(body[0].name, 'result[0]: \"name\" field').eq('User1');\r",
 									"    pm.expect(body[0].email, 'result[0]: \"email\" field').eq('user1@hotmail.com')\r",
 									"\r",
-									"    pm.expect(body[1].id, 'result[0]: \"id\" field').eq(62);\r",
+									"    pm.expect(body[1].id, 'result[0]: \"id\" field').eq(65);\r",
 									"    pm.expect(body[1].name, 'result[0]: \"name\" field').eq('Bad user');\r",
 									"    pm.expect(body[1].email, 'result[0]: \"email\" field').eq('bad_user@hotmail.com')\r",
 									"})"
@@ -106,7 +106,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/admin/users?ids=61,62",
+							"raw": "{{baseUrl}}/admin/users?ids=64,65",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -117,7 +117,7 @@
 							"query": [
 								{
 									"key": "ids",
-									"value": "61,62"
+									"value": "64,65"
 								}
 							]
 						}
@@ -163,7 +163,7 @@
 									"pm.test(\"Данные ответа не совпадают с ожидаемыми\", () => {\r",
 									"    var response = pm.response.json();\r",
 									"\r",
-									"    pm.expect(response.id, '\"id\" field').eq(56);\r",
+									"    pm.expect(response.id, '\"id\" field').eq(59);\r",
 									"    pm.expect(response.name, '\"name\" field').eq('category1');\r",
 									"})"
 								],
@@ -197,7 +197,7 @@
 									"pm.test(\"Данные в ответе не совпадают с ожидаемыми\", () => {\r",
 									"    var response = pm.response.json();\r",
 									"\r",
-									"    pm.expect(response.id, '\"id\" field').eq(56);\r",
+									"    pm.expect(response.id, '\"id\" field').eq(59);\r",
 									"    pm.expect(response.name, '\"name\" field').eq('category1');\r",
 									"})"
 								],
@@ -220,7 +220,7 @@
 							"variable": [
 								{
 									"key": "catId",
-									"value": "56"
+									"value": "59"
 								}
 							]
 						}
@@ -330,7 +330,7 @@
 							"variable": [
 								{
 									"key": "userId",
-									"value": "61"
+									"value": "64"
 								}
 							]
 						}
@@ -370,7 +370,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/users/:userId/comments?eventId=35",
+							"raw": "{{baseUrl}}/users/:userId/comments?eventId=39",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -382,13 +382,13 @@
 							"query": [
 								{
 									"key": "eventId",
-									"value": "35"
+									"value": "39"
 								}
 							],
 							"variable": [
 								{
 									"key": "userId",
-									"value": "61"
+									"value": "64"
 								}
 							]
 						}
@@ -458,7 +458,7 @@
 							"variable": [
 								{
 									"key": "eventId",
-									"value": "35"
+									"value": "39"
 								}
 							]
 						}
@@ -503,7 +503,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/users/:userId/comments?eventId=35",
+							"raw": "{{baseUrl}}/users/:userId/comments?eventId=39",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -515,13 +515,13 @@
 							"query": [
 								{
 									"key": "eventId",
-									"value": "35"
+									"value": "39"
 								}
 							],
 							"variable": [
 								{
 									"key": "userId",
-									"value": "61"
+									"value": "64"
 								}
 							]
 						}
@@ -570,7 +570,7 @@
 							"variable": [
 								{
 									"key": "userId",
-									"value": "61"
+									"value": "64"
 								},
 								{
 									"key": "commentId",
@@ -622,11 +622,11 @@
 							"variable": [
 								{
 									"key": "userId",
-									"value": "61"
+									"value": "64"
 								},
 								{
 									"key": "eventId",
-									"value": "35"
+									"value": "39"
 								}
 							]
 						}
@@ -707,7 +707,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/comments?eventId=35",
+							"raw": "{{baseUrl}}/comments?eventId=39",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -717,7 +717,7 @@
 							"query": [
 								{
 									"key": "eventId",
-									"value": "35"
+									"value": "39"
 								}
 							]
 						}
@@ -765,11 +765,11 @@
 							"variable": [
 								{
 									"key": "userId",
-									"value": "61"
+									"value": "64"
 								},
 								{
 									"key": "eventId",
-									"value": "35"
+									"value": "39"
 								}
 							]
 						}
@@ -787,7 +787,7 @@
 									"    pm.expect(pm.response.code).to.be.eq(200);\r",
 									"})\r",
 									"\r",
-									"pm.test(\"Данные не соответсвуют ожидаемым\", () => {\r",
+									"pm.test(\"Данные не соответствуют ожидаемым\", () => {\r",
 									"    var response = pm.response.json();\r",
 									"\r",
 									"    pm.expect(response.id, '\"id\" field').eq(1);\r",
@@ -827,7 +827,7 @@
 							"variable": [
 								{
 									"key": "userId",
-									"value": "61"
+									"value": "64"
 								},
 								{
 									"key": "commentId",
@@ -849,7 +849,7 @@
 									"    pm.expect(pm.response.code).to.be.eq(200);\r",
 									"})\r",
 									"\r",
-									"pm.test(\"Событие должно содежрать комментарии к нему\", () => {\r",
+									"pm.test(\"Событие должно содержать комментарии к нему\", () => {\r",
 									"    var response = pm.response.json();\r",
 									"\r",
 									"    pm.expect(response.comments[0].text, '\"text\" field').eq('update user1 comment');\r",
@@ -879,11 +879,11 @@
 							"variable": [
 								{
 									"key": "userId",
-									"value": "61"
+									"value": "64"
 								},
 								{
 									"key": "eventId",
-									"value": "35"
+									"value": "39"
 								}
 							]
 						}
@@ -922,7 +922,7 @@
 							"variable": [
 								{
 									"key": "userId",
-									"value": "61"
+									"value": "64"
 								},
 								{
 									"key": "commentId",
@@ -944,7 +944,7 @@
 									"    pm.expect(pm.response.code).to.be.eq(200);\r",
 									"})\r",
 									"\r",
-									"pm.test(\"Событие недолжно содежрать комментарии к нему\", () => {\r",
+									"pm.test(\"Событие не должно содержать комментарии к нему\", () => {\r",
 									"    var response = pm.response.json();\r",
 									"\r",
 									"    pm.expect(response.comments.length, 'comments count in total').to.eq(0);\r",
@@ -971,11 +971,11 @@
 							"variable": [
 								{
 									"key": "userId",
-									"value": "61"
+									"value": "64"
 								},
 								{
 									"key": "eventId",
-									"value": "35"
+									"value": "39"
 								}
 							]
 						}
@@ -1020,7 +1020,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/users/:userId/comments?eventId=35",
+							"raw": "{{baseUrl}}/users/:userId/comments?eventId=39",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -1032,13 +1032,13 @@
 							"query": [
 								{
 									"key": "eventId",
-									"value": "35"
+									"value": "39"
 								}
 							],
 							"variable": [
 								{
 									"key": "userId",
-									"value": "62"
+									"value": "65"
 								}
 							]
 						}
@@ -1046,7 +1046,7 @@
 					"response": []
 				},
 				{
-					"name": "Удаление администратором коммнетария пользователя bad user",
+					"name": "Удаление администратором комментария пользователя bad user",
 					"event": [
 						{
 							"listen": "test",
@@ -1078,7 +1078,7 @@
 							"variable": [
 								{
 									"key": "userId",
-									"value": "62"
+									"value": "65"
 								},
 								{
 									"key": "commentId",
@@ -1090,7 +1090,7 @@
 					"response": []
 				},
 				{
-					"name": "Получение события event1 после удаления акомменатрия bad user",
+					"name": "Получение события event1 после удаления комментария bad user",
 					"event": [
 						{
 							"listen": "test",
@@ -1100,7 +1100,7 @@
 									"    pm.expect(pm.response.code).to.be.eq(200);\r",
 									"})\r",
 									"\r",
-									"pm.test(\"Событие недолжно содежрать комментарии к нему\", () => {\r",
+									"pm.test(\"Событие не должно содержать комментарии к нему\", () => {\r",
 									"    var response = pm.response.json();\r",
 									"\r",
 									"    pm.expect(response.comments.length, 'comments count in total').to.eq(0);\r",
@@ -1127,11 +1127,11 @@
 							"variable": [
 								{
 									"key": "userId",
-									"value": "61"
+									"value": "64"
 								},
 								{
 									"key": "eventId",
-									"value": "35"
+									"value": "39"
 								}
 							]
 						}
@@ -1149,11 +1149,11 @@
 									"    pm.expect(pm.response.code).to.eq(200);\r",
 									"})\r",
 									"\r",
-									"pm.test(\"Данные не соответсвуют ожидаемым\", () => {\r",
+									"pm.test(\"Данные не соответствуют ожидаемым\", () => {\r",
 									"    var response = pm.response.json();\r",
 									"\r",
 									"    pm.expect(response.length, 'array length').to.be.gte(1);\r",
-									"    pm.expect(response[0].id, '\"id\" field').eq(62);\r",
+									"    pm.expect(response[0].id, '\"id\" field').eq(65);\r",
 									"    pm.expect(response[0].name, '\"name\" field').eq('Bad user');\r",
 									"    pm.expect(response[0].email, '\"email\" field').eq('bad_user@hotmail.com');\r",
 									"    pm.expect(response[0].commentsIsBlocked, '\"commentsIsBlocked\" field').eq(true);\r",
@@ -1168,7 +1168,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"userIds\": [62],\r\n  \"status\": \"BANNED\"\r\n}",
+							"raw": "{\r\n  \"userIds\": [65],\r\n  \"status\": \"BANNED\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1207,7 +1207,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/users/:userId/comments?eventId=35",
+							"raw": "{{baseUrl}}/users/:userId/comments?eventId=39",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -1219,13 +1219,13 @@
 							"query": [
 								{
 									"key": "eventId",
-									"value": "35"
+									"value": "39"
 								}
 							],
 							"variable": [
 								{
 									"key": "userId",
-									"value": "62"
+									"value": "65"
 								}
 							]
 						}
@@ -1243,11 +1243,11 @@
 									"    pm.expect(pm.response.code).to.eq(200);\r",
 									"})\r",
 									"\r",
-									"pm.test(\"Данные не соответсвуют ожидаемым\", () => {\r",
+									"pm.test(\"Данные не соответствуют ожидаемым\", () => {\r",
 									"    var response = pm.response.json();\r",
 									"\r",
 									"    pm.expect(response.length, 'array length').to.be.gte(1);\r",
-									"    pm.expect(response[0].id, '\"id\" field').eq(62);\r",
+									"    pm.expect(response[0].id, '\"id\" field').eq(65);\r",
 									"    pm.expect(response[0].name, '\"name\" field').eq('Bad user');\r",
 									"    pm.expect(response[0].email, '\"email\" field').eq('bad_user@hotmail.com');\r",
 									"    pm.expect(response[0].commentsIsBlocked, '\"commentsIsBlocked\" field').eq(false);\r",
@@ -1263,7 +1263,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"userIds\": [62],\r\n  \"status\": \"UNBANNED\"\r\n}",
+							"raw": "{\r\n  \"userIds\": [65],\r\n  \"status\": \"UNBANNED\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1312,7 +1312,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/users/:userId/comments?eventId=35",
+							"raw": "{{baseUrl}}/users/:userId/comments?eventId=39",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -1324,13 +1324,13 @@
 							"query": [
 								{
 									"key": "eventId",
-									"value": "35"
+									"value": "39"
 								}
 							],
 							"variable": [
 								{
 									"key": "userId",
-									"value": "62"
+									"value": "65"
 								}
 							]
 						}
