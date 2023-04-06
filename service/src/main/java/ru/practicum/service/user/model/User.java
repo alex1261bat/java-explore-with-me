@@ -20,6 +20,8 @@ public class User {
     private String name;
     @Column(name = "EMAIL", nullable = false, unique = true)
     private String email;
+    @Column(name = "COMMENTS_IS_BLOCKED", nullable = false)
+    private Boolean commentsIsBlocked;
 
     @Override
     public boolean equals(Object o) {

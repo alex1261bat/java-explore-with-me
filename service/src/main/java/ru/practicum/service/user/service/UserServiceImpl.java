@@ -8,13 +8,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.service.exceptions.NotFoundException;
+import ru.practicum.service.user.dto.UserCommentsStatusDto;
 import ru.practicum.service.user.dto.UserDto;
 import ru.practicum.service.user.dto.UserMapper;
 import ru.practicum.service.user.model.QUser;
 import ru.practicum.service.user.model.User;
+import ru.practicum.service.user.model.UserCommentsStatus;
 import ru.practicum.service.user.repository.UserRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -25,6 +28,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto createUser(UserDto userDto) {
+        userDto.setCommentsIsBlocked(false);
+
         return userMapper.mapToUserDto(userRepository.save(userMapper.mapToUser(userDto)));
     }
 
@@ -56,5 +61,23 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new NotFoundException("Пользователь с id=" + userId + " не найден");
         }
+    }
+
+    @Override
+    @Transactional
+    public List<UserDto> changeUserCommentsStatus(UserCommentsStatusDto userCommentsStatusDto) {
+
+        return userRepository.findAllByUserIdIn(userCommentsStatusDto.getUserIds()).stream()
+                .peek(u -> {
+                    if (userCommentsStatusDto.getStatus().equals(UserCommentsStatus.BANNED)) {
+                        u.setCommentsIsBlocked(Boolean.TRUE);
+                    }
+
+                    if (userCommentsStatusDto.getStatus().equals(UserCommentsStatus.UNBANNED)) {
+                        u.setCommentsIsBlocked(Boolean.FALSE);
+                    }
+                })
+                .map(userMapper::mapToUserDto)
+                .collect(Collectors.toList());
     }
 }

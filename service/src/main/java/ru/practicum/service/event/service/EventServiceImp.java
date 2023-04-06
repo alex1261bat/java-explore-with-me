@@ -11,6 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.StatisticDto;
 import ru.practicum.service.category.model.Category;
 import ru.practicum.service.category.repository.CategoryRepository;
+import ru.practicum.service.comment.dto.CommentMapper;
+import ru.practicum.service.comment.dto.CommentShortDto;
+import ru.practicum.service.comment.repository.CommentRepository;
 import ru.practicum.service.event.dto.*;
 import ru.practicum.service.event.model.Event;
 import ru.practicum.service.event.model.EventStateAction;
@@ -33,10 +36,7 @@ import ru.practicum.service.user.repository.UserRepository;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -52,6 +52,8 @@ public class EventServiceImp implements EventService {
     private final RequestRepository requestRepository;
     private final EventMapper eventMapper;
     private final RequestMapper requestMapper;
+    private final CommentRepository commentRepository;
+    private final CommentMapper commentMapper;
 
     @Override
     @Transactional
@@ -89,8 +91,14 @@ public class EventServiceImp implements EventService {
     @Transactional(readOnly = true)
     public EventDto getPrivateUserEvent(Long userId, Long eventId) {
         if (userRepository.existsById(userId)) {
-            return eventMapper.mapToEventDto(eventRepository.findByEventIdAndInitiatorUserId(eventId, userId)
+            EventDto eventDto = eventMapper.mapToEventDto(
+                    eventRepository.findByEventIdAndInitiatorUserId(eventId, userId)
                     .orElseThrow(() -> new NotFoundException("Событие с id=" + eventId + " не найдено")));
+            List<CommentShortDto> commentShortDtoList = commentMapper.mapToSetCommentShort(
+                    commentRepository.findAllByEventEventId(eventId));
+            eventDto.setComments(commentShortDtoList);
+
+            return eventDto;
         } else {
             throw new NotFoundException("Пользователь с id=" + userId + " не найден");
         }

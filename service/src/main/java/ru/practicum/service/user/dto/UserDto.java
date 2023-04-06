@@ -1,5 +1,6 @@
 package ru.practicum.service.user.dto;
 
+import jdk.jfr.BooleanFlag;
 import lombok.Builder;
 import lombok.Data;
 
@@ -15,4 +16,6 @@ public class UserDto {
     @Email
     @NotNull
     private String email;
+    @BooleanFlag
+    private Boolean commentsIsBlocked;
 }
