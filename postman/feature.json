@@ -438,7 +438,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"annotation\": \"Nesciunt quasi magnam labore beatae est fugit quia quis. Est expedita facere. Ipsam atque est omnis esse explicabo eum. Sapiente quas dolore. Necessitatibus temporibus est totam iusto modi nobis eos adipisci voluptas.\",\r\n  \"category\": 1,\r\n  \"description\": \"Eos cumque libero velit accusantium aliquid maiores et ut aut. Corrupti non sit ducimus non. Officia totam odit dolorem ut.\\n \\rSaepe ipsam beatae aut sed minus ducimus doloremque. Provident officiis commodi vel dolores qui repudiandae error quia. Dolorem odio qui nihil sunt atque. Voluptatibus et nulla ab similique aliquam cum ad doloribus. Eligendi autem fugit et qui veritatis modi. Recusandae quae perferendis similique ut quam ipsam.\\n \\rEos natus dolorem officiis sequi molestiae quis culpa quod. Id quis aut illo accusantium hic. Est fugiat consequatur soluta repellendus ipsum voluptatem. Ad similique aut quasi temporibus inventore corporis. Aut id aliquam eos deserunt alias dolore tempora harum. Qui quia accusantium.\",\r\n  \"eventDate\": \"2123-02-11 20:03:36\",\r\n  \"location\": {\r\n    \"lat\": -78.9404,\r\n    \"lon\": 44.2589\r\n  },\r\n  \"paid\": false,\r\n  \"participantLimit\": 545,\r\n  \"requestModeration\": true,\r\n  \"stateAction\": \"PUBLISH_EVENT\",\r\n  \"title\": \"Iusto unde non et voluptatem facere quisquam.\"\r\n}",
+							"raw": "{\r\n  \"annotation\": \"Nesciunt quasi magnam labore beatae est fugit quia quis. Est expedita facere. Ipsam atque est omnis esse explicabo eum. Sapiente quas dolore. Necessitatibus temporibus est totam iusto modi nobis eos adipisci voluptas.\",\r\n  \"category\": 1,\r\n  \"description\": \"Eos cumque libero velit accusantium aliquid maiores et ut aut. Corrupti non sit ducimus non. Officia totam odit dolorem ut.\\n \\rSaepe ipsam beatae aut sed minus ducimus doloremque. Provident officiis commodi vel dolores qui repudiandae error quia. Dolorem odio qui nihil sunt atque. Voluptatibus et nulla ab similique aliquam cum ad doloribus. Eligendi autem fugit et qui veritatis modi. Recusandae quae perferendis similique ut quam ipsam.\\n \\rEos natus dolorem officiis sequi molestiae quis culpa quod. Id quis aut illo accusantium hic. Est fugiat consequatur soluta repellendus ipsum voluptatem. Ad similique aut quasi temporibus inventore corporis. Aut id aliquam eos deserunt alias dolore tempora harum. Qui quia accusantium.\",\r\n  \"eventDate\": \"2123-02-11 20:03:36\",\r\n  \"location\": {\r\n    \"lat\": -78.9404,\r\n    \"lon\": 44.2589\r\n  },\r\n  \"paid\": false,\r\n  \"participantLimit\": 545,\r\n  \"requestModeration\": false,\r\n  \"stateAction\": \"PUBLISH_EVENT\",\r\n  \"title\": \"Iusto unde non et voluptatem facere quisquam.\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -466,7 +466,7 @@
 					"response": []
 				},
 				{
-					"name": "Добавление пользователем user1 комментария к опубликованному событию event1",
+					"name": "Добавление пользователем user1 комментария к своему опубликованному событию event1",
 					"event": [
 						{
 							"listen": "test",
@@ -522,6 +522,59 @@
 								{
 									"key": "userId",
 									"value": "64"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Добавление пользователем bad user комментария к событию event1, в котором не участвовал",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса должен быть 409\", () => {\r",
+									"    pm.expect(pm.response.code).to.be.eq(409);\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"text\": \"user1 comment\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/:userId/comments?eventId=39",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								":userId",
+								"comments"
+							],
+							"query": [
+								{
+									"key": "eventId",
+									"value": "39"
+								}
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "65"
 								}
 							]
 						}
@@ -735,7 +788,7 @@
 									"    pm.expect(pm.response.code).to.be.eq(200);\r",
 									"})\r",
 									"\r",
-									"pm.test(\"Событие должно содежрать комментарии к нему\", () => {\r",
+									"pm.test(\"Событие должно содержать комментарии к нему\", () => {\r",
 									"    var response = pm.response.json();\r",
 									"\r",
 									"    pm.expect(response.comments[0].text, '\"text\" field').eq('user1 comment');\r",
@@ -828,6 +881,58 @@
 								{
 									"key": "userId",
 									"value": "64"
+								},
+								{
+									"key": "commentId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Обновление пользователем bad user комментария пользователя user1 к событию event1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса должен быть 404\", () => {\r",
+									"    pm.expect(pm.response.code).to.be.eq(404);\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"text\": \"update user1 comment\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/:userId/comments/:commentId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								":userId",
+								"comments",
+								":commentId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "65"
 								},
 								{
 									"key": "commentId",
@@ -976,6 +1081,51 @@
 								{
 									"key": "eventId",
 									"value": "39"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Добавление пользователем bad user запроса на участие в событии event1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса должен быть 201\", () => {\r",
+									"    pm.expect(pm.response.code).to.eq(201)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/:userId/requests?eventId=39",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								":userId",
+								"requests"
+							],
+							"query": [
+								{
+									"key": "eventId",
+									"value": "39"
+								}
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "65"
 								}
 							]
 						}
@@ -1152,11 +1302,10 @@
 									"pm.test(\"Данные не соответствуют ожидаемым\", () => {\r",
 									"    var response = pm.response.json();\r",
 									"\r",
-									"    pm.expect(response.length, 'array length').to.be.gte(1);\r",
-									"    pm.expect(response[0].id, '\"id\" field').eq(65);\r",
-									"    pm.expect(response[0].name, '\"name\" field').eq('Bad user');\r",
-									"    pm.expect(response[0].email, '\"email\" field').eq('bad_user@hotmail.com');\r",
-									"    pm.expect(response[0].commentsIsBlocked, '\"commentsIsBlocked\" field').eq(true);\r",
+									"    pm.expect(response.id, '\"id\" field').eq(65);\r",
+									"    pm.expect(response.name, '\"name\" field').eq('Bad user');\r",
+									"    pm.expect(response.email, '\"email\" field').eq('bad_user@hotmail.com');\r",
+									"    pm.expect(response.commentsIsBlocked, '\"commentsIsBlocked\" field').eq(true);\r",
 									"})"
 								],
 								"type": "text/javascript"
@@ -1168,7 +1317,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"userIds\": [65],\r\n  \"status\": \"BANNED\"\r\n}",
+							"raw": "{\r\n  \"userId\": 65,\r\n  \"status\": \"BANNED\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1246,11 +1395,10 @@
 									"pm.test(\"Данные не соответствуют ожидаемым\", () => {\r",
 									"    var response = pm.response.json();\r",
 									"\r",
-									"    pm.expect(response.length, 'array length').to.be.gte(1);\r",
-									"    pm.expect(response[0].id, '\"id\" field').eq(65);\r",
-									"    pm.expect(response[0].name, '\"name\" field').eq('Bad user');\r",
-									"    pm.expect(response[0].email, '\"email\" field').eq('bad_user@hotmail.com');\r",
-									"    pm.expect(response[0].commentsIsBlocked, '\"commentsIsBlocked\" field').eq(false);\r",
+									"    pm.expect(response.id, '\"id\" field').eq(65);\r",
+									"    pm.expect(response.name, '\"name\" field').eq('Bad user');\r",
+									"    pm.expect(response.email, '\"email\" field').eq('bad_user@hotmail.com');\r",
+									"    pm.expect(response.commentsIsBlocked, '\"commentsIsBlocked\" field').eq(false);\r",
 									"\r",
 									"})"
 								],
@@ -1263,7 +1411,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"userIds\": [65],\r\n  \"status\": \"UNBANNED\"\r\n}",
+							"raw": "{\r\n  \"userId\": 65,\r\n  \"status\": \"UNBANNED\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

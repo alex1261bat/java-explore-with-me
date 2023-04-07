@@ -13,5 +13,5 @@ public interface UserService {
 
     void deleteUser(Long userId);
 
-    List<UserDto> changeUserCommentsStatus(UserCommentsStatusDto userCommentsStatusDto);
+    UserDto changeUserCommentsStatus(UserCommentsStatusDto userCommentsStatusDto);
 }

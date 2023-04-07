@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 public class UserCommentsStatusDto {
     @NotNull
-    private List<Long> userIds;
+    private Long userId;
     @NotNull
     private UserCommentsStatus status;
 }

@@ -98,5 +98,9 @@ public class RequestServiceImp implements RequestService {
         if (event.getState() != State.PUBLISHED) {
             throw new ValidationException("Вы не можете участвовать в неопубликованном мероприятии");
         }
+
+        if (requestRepository.findAllByRequesterUserIdAndEvent(userId, event).size() > 0) {
+            throw new ValidationException("Вы не можете создать более одного запроса на участие в одном мероприятии");
+        }
     }
 }

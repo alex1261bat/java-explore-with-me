@@ -50,7 +50,7 @@ public class UserController {
     }
 
     @PatchMapping("comments")
-    public ResponseEntity<List<UserDto>> changeUserCommentsStatus(@Validated @RequestBody UserCommentsStatusDto users) {
+    public ResponseEntity<UserDto> changeUserCommentsStatus(@Valid @RequestBody UserCommentsStatusDto users) {
         log.info("Изменение статуса блокировки комментариев пользователей:{}", users);
 
         return ResponseEntity.status(HttpStatus.OK).body(userService.changeUserCommentsStatus(users));

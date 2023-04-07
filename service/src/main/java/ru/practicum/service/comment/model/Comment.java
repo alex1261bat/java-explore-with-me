@@ -24,6 +24,8 @@ public class Comment {
     private CommentState state = CommentState.NOT_EDITED;
     @Column(name = "CREATED", nullable = false)
     private LocalDateTime created;
+    @Column(name = "EDITED")
+    private LocalDateTime edited;
     @ManyToOne
     @JoinColumn(name = "AUTHOR_ID")
     private User author;

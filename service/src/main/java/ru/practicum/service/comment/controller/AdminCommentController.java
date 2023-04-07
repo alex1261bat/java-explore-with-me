@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.service.comment.dto.CommentDto;
 import ru.practicum.service.comment.service.CommentService;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 
 @RestController
@@ -32,7 +33,7 @@ public class AdminCommentController {
     @PatchMapping("{userId}/comments/{commentId}")
     public ResponseEntity<CommentDto> updateCommentAdmin(@PathVariable @Positive Long userId,
                                                          @PathVariable @Positive Long commentId,
-                                                         @RequestBody @Validated CommentDto commentDto) {
+                                                         @RequestBody @Valid CommentDto commentDto) {
         log.info("Обновление администратором комментария с commentId={} и userId={}: {}", commentId, userId, commentDto);
 
         return ResponseEntity.status(HttpStatus.OK)

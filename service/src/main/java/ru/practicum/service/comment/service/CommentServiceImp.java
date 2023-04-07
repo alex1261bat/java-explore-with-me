@@ -15,6 +15,9 @@ import ru.practicum.service.event.model.State;
 import ru.practicum.service.event.repository.EventRepository;
 import ru.practicum.service.exceptions.NotFoundException;
 import ru.practicum.service.exceptions.ValidationException;
+import ru.practicum.service.request.model.Request;
+import ru.practicum.service.request.model.RequestStatus;
+import ru.practicum.service.request.repository.RequestRepository;
 import ru.practicum.service.user.model.User;
 import ru.practicum.service.user.repository.UserRepository;
 
@@ -30,11 +33,11 @@ public class CommentServiceImp implements CommentService {
     private final CommentMapper mapper;
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
+    private final RequestRepository requestRepository;
 
     @Override
     @Transactional
-    public CommentDto addComment(Long userId, Long eventId,
-                                 CommentDto newComment) {
+    public CommentDto addComment(Long userId, Long eventId, CommentDto newComment) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id=" + userId + " не найден"));
         Event event;
@@ -50,6 +53,14 @@ public class CommentServiceImp implements CommentService {
             throw new ValidationException("Невозможно добавить комментарий к событию в статусе " + event.getState());
         }
 
+        if (!event.getInitiator().getUserId().equals(userId)) {
+            Request request = requestRepository.findByRequesterUserIdAndEvent(userId, event);
+
+            if (request == null || request.getStatus() != RequestStatus.CONFIRMED) {
+                throw new ValidationException("Невозможно добавить комментарий к событию, в котором не принимали участие");
+            }
+        }
+
         Comment comment = mapper.mapToComment(newComment);
         comment.setAuthor(user);
         comment.setEvent(event);
@@ -61,8 +72,7 @@ public class CommentServiceImp implements CommentService {
 
     @Override
     @Transactional
-    public CommentDto updateUserComment(Long userId, Long commentId,
-                                        CommentDto updateComment) {
+    public CommentDto updateUserComment(Long userId, Long commentId, CommentDto updateComment) {
         Comment comment = findByCommentIdAndAuthorId(commentId, userId);
 
         if (LocalDateTime.now().isAfter(comment.getCreated().plusHours(1))) {
@@ -70,6 +80,7 @@ public class CommentServiceImp implements CommentService {
         }
 
         comment.setState(CommentState.EDITED);
+        comment.setEdited(LocalDateTime.now());
 
         return mapper.mapToCommentDto(commentRepository.save(mapper.mapToComment(updateComment, comment)));
     }
@@ -95,10 +106,10 @@ public class CommentServiceImp implements CommentService {
 
     @Override
     @Transactional
-    public CommentDto updateCommentAdmin(Long userId, Long commentId,
-                                         CommentDto updateComment) {
+    public CommentDto updateCommentAdmin(Long userId, Long commentId, CommentDto updateComment) {
         Comment comment = findByCommentIdAndAuthorId(commentId, userId);
         comment.setState(CommentState.EDITED);
+        comment.setEdited(LocalDateTime.now());
 
         return mapper.mapToCommentDto(commentRepository.save(mapper.mapToComment(updateComment, comment)));
     }
