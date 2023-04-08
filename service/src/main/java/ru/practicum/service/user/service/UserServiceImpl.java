@@ -8,10 +8,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.service.exceptions.NotFoundException;
+import ru.practicum.service.exceptions.ValidationException;
+import ru.practicum.service.user.dto.UserCommentsStatusDto;
 import ru.practicum.service.user.dto.UserDto;
 import ru.practicum.service.user.dto.UserMapper;
 import ru.practicum.service.user.model.QUser;
 import ru.practicum.service.user.model.User;
+import ru.practicum.service.user.model.UserCommentsStatus;
 import ru.practicum.service.user.repository.UserRepository;
 
 import java.util.List;
@@ -25,6 +28,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto createUser(UserDto userDto) {
+        userDto.setCommentsIsBlocked(false);
+
         return userMapper.mapToUserDto(userRepository.save(userMapper.mapToUser(userDto)));
     }
 
@@ -56,5 +61,23 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new NotFoundException("Пользователь с id=" + userId + " не найден");
         }
+    }
+
+    @Override
+    @Transactional
+    public UserDto changeUserCommentsStatus(UserCommentsStatusDto userCommentsStatusDto) {
+        User user = userRepository.findById(userCommentsStatusDto.getUserId())
+                .orElseThrow(() -> new NotFoundException("Пользователь с id=" + userCommentsStatusDto.getUserId()
+                        + " не найден"));
+
+        if (userCommentsStatusDto.getStatus().equals(UserCommentsStatus.BANNED)) {
+            user.setCommentsIsBlocked(Boolean.TRUE);
+        } else if (userCommentsStatusDto.getStatus().equals(UserCommentsStatus.UNBANNED)) {
+            user.setCommentsIsBlocked(Boolean.FALSE);
+        } else {
+            throw new ValidationException("Недопустимый параметр запроса " + userCommentsStatusDto.getStatus());
+        }
+
+        return userMapper.mapToUserDto(userRepository.save(user));
     }
 }

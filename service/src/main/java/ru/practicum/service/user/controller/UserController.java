@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.service.user.dto.UserCommentsStatusDto;
 import ru.practicum.service.user.dto.UserDto;
 import ru.practicum.service.user.service.UserService;
 
@@ -46,5 +47,12 @@ public class UserController {
         userService.deleteUser(userId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PatchMapping("comments")
+    public ResponseEntity<UserDto> changeUserCommentsStatus(@Valid @RequestBody UserCommentsStatusDto users) {
+        log.info("Изменение статуса блокировки комментариев пользователей:{}", users);
+
+        return ResponseEntity.status(HttpStatus.OK).body(userService.changeUserCommentsStatus(users));
     }
 }
